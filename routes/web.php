@@ -20,6 +20,14 @@ Route::get('/admin/login', [AuthController::class, 'showLoginForm'])->name('logi
 Route::post('/admin/login', [AuthController::class, 'login'])->name('admin.login.submit');
 Route::post('/admin/logout', [AuthController::class, 'logout'])->name('admin.logout');
 
+Route::get('/admin/register', [AuthController::class, 'showRegisterForm'])->name('admin.register');
+Route::post('/admin/register', [AuthController::class, 'register'])->name('admin.register.submit');
+
+Route::get('/admin/forgot-password', [AuthController::class, 'showForgotPasswordForm'])->name('admin.password.request');
+Route::post('/admin/forgot-password', [AuthController::class, 'sendResetLinkEmail'])->name('admin.password.email');
+Route::get('/admin/reset-password/{token}', [AuthController::class, 'showResetPasswordForm'])->name('password.reset');
+Route::post('/admin/reset-password', [AuthController::class, 'resetPassword'])->name('admin.password.update');
+
 // Admin Dashboard & Management Routes (Protected)
 Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () {
     // Dashboard & Profile Info

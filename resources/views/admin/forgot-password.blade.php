@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Iniciar Sesión - Panel de Administración</title>
+    <title>Recuperar Contraseña - Panel de Control</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Alex+Brush&display=swap" rel="stylesheet">
@@ -47,7 +47,7 @@
             overflow: hidden;
         }
 
-        /* Left Panel - Crisp White Side */
+        /* Left Panel - White Side */
         .login-left-panel {
             flex: 0 0 520px;
             width: 520px;
@@ -67,7 +67,7 @@
             to { opacity: 1; transform: translateX(0); }
         }
 
-        /* Right Panel - Pure Image Side (No Text) */
+        /* Right Panel - Image Side */
         .login-right-panel {
             flex: 1;
             position: relative;
@@ -92,7 +92,7 @@
             to { transform: scale(1.08); }
         }
 
-        /* Brand / Calligraphic JC Logo in dark */
+        /* Brand Logo */
         .login-brand {
             font-family: 'Alex Brush', cursive;
             font-size: 2.8rem;
@@ -137,18 +137,15 @@
             font-size: 0.95rem;
             color: var(--text-secondary);
             font-weight: 300;
+            line-height: 1.5;
         }
 
-        /* Forms Layout & Inputs */
+        /* Form Group & Inputs */
         .form-group {
             margin-bottom: 1.4rem;
             opacity: 0;
-            animation: formFadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            animation: formFadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.2s forwards;
         }
-
-        .form-group:nth-child(1) { animation-delay: 0.2s; }
-        .form-group:nth-child(2) { animation-delay: 0.3s; }
-        .form-group:nth-child(3) { animation-delay: 0.4s; }
 
         @keyframes formFadeInUp {
             from { opacity: 0; transform: translateY(20px); }
@@ -204,120 +201,7 @@
             transform: translateY(-2px);
         }
 
-        .form-input:focus + .input-icon {
-            color: #0f172a;
-        }
-
-        /* Checkbox customization */
-        .checkbox-group {
-            display: flex;
-            align-items: center;
-            gap: 0.65rem;
-            margin-top: 0;
-        }
-
-        .checkbox-input {
-            width: 16px;
-            height: 16px;
-            accent-color: var(--insta-magenta);
-            cursor: pointer;
-            border-radius: 4px;
-            background: #f8fafc;
-            border: 1px solid var(--border-color);
-        }
-
-        .checkbox-label {
-            font-size: 0.85rem;
-            color: var(--text-secondary);
-            font-weight: 300;
-            cursor: pointer;
-            user-select: none;
-        }
-
-        .toggle-password-btn {
-            position: absolute;
-            right: 1.1rem;
-            top: 50%;
-            transform: translateY(-50%);
-            background: none;
-            border: none;
-            color: var(--text-muted);
-            font-size: 1rem;
-            cursor: pointer;
-            padding: 0.2rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: color 0.3s ease;
-            z-index: 5;
-        }
-
-        .toggle-password-btn:hover {
-            color: #0f172a;
-        }
-
-        .form-input.has-toggle {
-            padding-right: 2.8rem;
-        }
-
-        .form-row-between {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 1rem;
-            flex-wrap: wrap;
-            margin-top: 1rem;
-        }
-
-        .forgot-password-link {
-            font-size: 0.85rem;
-            color: var(--insta-magenta);
-            text-decoration: none;
-            font-weight: 500;
-            transition: opacity 0.3s ease;
-        }
-
-        .forgot-password-link:hover {
-            opacity: 0.85;
-            text-decoration: underline;
-        }
-
-        .auth-footer-prompt {
-            text-align: center;
-            margin-top: 1.8rem;
-            font-size: 0.9rem;
-            color: var(--text-secondary);
-            animation: formFadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.4s forwards;
-            opacity: 0;
-        }
-
-        .auth-footer-prompt a {
-            color: var(--insta-purple);
-            font-weight: 600;
-            text-decoration: none;
-            transition: all 0.3s ease;
-        }
-
-        .auth-footer-prompt a:hover {
-            color: var(--insta-magenta);
-            text-decoration: underline;
-        }
-
-        .alert-success-box {
-            background: #f0fdf4;
-            border: 1px solid #bbf7d0;
-            border-radius: 12px;
-            padding: 0.9rem 1.2rem;
-            margin-bottom: 1.8rem;
-            color: #166534;
-            font-size: 0.88rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            animation: formFadeInUp 0.5s ease;
-        }
-
-        /* Alert Box */
+        /* Alert Boxes */
         .alert-box {
             background: #fef2f2;
             border: 1px solid #fee2e2;
@@ -343,7 +227,21 @@
             gap: 0.5rem;
         }
 
-        /* Submit Button with Sunset Glow */
+        .alert-success-box {
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            border-radius: 12px;
+            padding: 0.9rem 1.2rem;
+            margin-bottom: 1.8rem;
+            color: #166534;
+            font-size: 0.88rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            animation: formFadeInUp 0.5s ease;
+        }
+
+        /* Submit Button */
         .btn-submit {
             width: 100%;
             padding: 1rem 1.8rem;
@@ -367,11 +265,28 @@
             box-shadow: 0 8px 25px rgba(225, 48, 108, 0.45);
         }
 
-        .btn-submit:active {
-            transform: translateY(0);
+        .auth-footer-prompt {
+            text-align: center;
+            margin-top: 1.8rem;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            animation: formFadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.4s forwards;
+            opacity: 0;
         }
 
-        /* Back link styling */
+        .auth-footer-prompt a {
+            color: var(--insta-purple);
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .auth-footer-prompt a:hover {
+            color: var(--insta-magenta);
+            text-decoration: underline;
+        }
+
+        /* Back Link */
         .back-link {
             animation: formFadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.5s forwards;
             opacity: 0;
@@ -393,7 +308,7 @@
             gap: 0.75rem;
         }
 
-        /* Responsive Design */
+        /* Responsive */
         @media (max-width: 992px) {
             .login-left-panel {
                 flex: 0 0 460px;
@@ -422,7 +337,6 @@
             }
 
             .login-form-container {
-                justify-content: center;
                 max-width: 440px;
                 width: 100%;
                 margin: 0 auto;
@@ -434,41 +348,19 @@
                 left: 3rem;
             }
         }
-
-        @media (max-width: 480px) {
-            .login-left-panel {
-                padding: 2.5rem 1.5rem;
-            }
-
-            .login-brand {
-                position: relative;
-                top: 0;
-                left: 0;
-                margin-bottom: 2rem;
-            }
-
-            .back-link {
-                position: relative;
-                bottom: 0;
-                left: 0;
-                margin-top: 2rem;
-                text-align: center;
-            }
-        }
     </style>
 </head>
 <body>
     <div class="login-split-container">
         
-        <!-- Left Panel: Form Section (White Theme) -->
+        <!-- Left Panel: Forgot Password Form -->
         <div class="login-left-panel">
-            <!-- Caligraphic Script Logo -->
             <div class="login-brand">JC</div>
 
             <div class="login-form-container">
                 <div class="login-header">
-                    <h1>Iniciar Sesión</h1>
-                    <p>Accede con tus credenciales de administrador</p>
+                    <h1>¿Olvidaste tu contraseña?</h1>
+                    <p>Ingresa tu correo electrónico registrado y te enviaremos las instrucciones para restablecerla.</p>
                 </div>
 
                 @if (session('status'))
@@ -485,7 +377,7 @@
                     </div>
                 @endif
 
-                <form action="{{ route('admin.login.submit') }}" method="POST">
+                <form action="{{ route('admin.password.email') }}" method="POST">
                     @csrf
 
                     <div class="form-group">
@@ -505,50 +397,15 @@
                         </div>
                     </div>
 
-                    <div class="form-group">
-                        <label for="password" class="form-label">Contraseña</label>
-                        <div class="input-wrapper">
-                            <input 
-                                type="password" 
-                                name="password" 
-                                id="password" 
-                                class="form-input has-toggle" 
-                                placeholder="••••••••" 
-                                required
-                            >
-                            <i class="fa-solid fa-lock input-icon"></i>
-                            <button type="button" class="toggle-password-btn" onclick="togglePasswordVisibility('password', this)" tabindex="-1" title="Mostrar/Ocultar contraseña">
-                                <i class="fa-regular fa-eye"></i>
-                            </button>
-                        </div>
-                    </div>
-
-                    <div class="form-group form-row-between">
-                        <div class="checkbox-group">
-                            <input 
-                                type="checkbox" 
-                                name="remember" 
-                                id="remember" 
-                                class="checkbox-input"
-                            >
-                            <label for="remember" class="checkbox-label">
-                                Recordar mi sesión
-                            </label>
-                        </div>
-                        <a href="{{ route('admin.password.request') }}" class="forgot-password-link">
-                            ¿Olvidaste tu contraseña?
-                        </a>
-                    </div>
-
                     <button type="submit" class="btn-submit">
-                        Ingresar al Panel
+                        Enviar Enlace de Recuperación
                     </button>
                 </form>
 
                 <div class="auth-footer-prompt">
-                    ¿No tienes una cuenta? 
-                    <a href="{{ route('admin.register') }}">
-                        Regístrate aquí
+                    ¿Recordaste tu contraseña? 
+                    <a href="{{ route('login') }}">
+                        Volver al inicio de sesión
                     </a>
                 </div>
             </div>
@@ -560,27 +417,11 @@
             </div>
         </div>
 
-        <!-- Right Panel: Image Section (Only Clean Image, No Overlay Text) -->
+        <!-- Right Panel: Image Section -->
         <div class="login-right-panel">
             <div class="login-right-image"></div>
         </div>
 
     </div>
-
-    <script>
-        function togglePasswordVisibility(inputId, btn) {
-            const input = document.getElementById(inputId);
-            const icon = btn.querySelector('i');
-            if (input.type === 'password') {
-                input.type = 'text';
-                icon.classList.remove('fa-eye');
-                icon.classList.add('fa-eye-slash');
-            } else {
-                input.type = 'password';
-                icon.classList.remove('fa-eye-slash');
-                icon.classList.add('fa-eye');
-            }
-        }
-    </script>
 </body>
 </html>
