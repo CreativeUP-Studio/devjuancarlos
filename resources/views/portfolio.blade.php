@@ -161,15 +161,6 @@
                 <div class="hero-action">
                     <a href="#contacto" class="btn-hablemos">Hablemos</a>
                 </div>
-            </div>
-        </div>
-
-        <!-- Bottom scroll indicator -->
-        <div class="hero-scroll-indicator">
-            <div class="scroll-mouse">
-                <div class="scroll-wheel"></div>
-            </div>
-            <span class="scroll-text">Scroll para explorar</span>
         </div>
     </section>
 
