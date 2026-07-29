@@ -367,26 +367,55 @@
         .alert-error .alert-icon { background: rgba(239, 68, 68, 0.1); color: #ef4444; }
         .alert-error .alert-title { color: #ef4444; }
         
-        /* RESPONSIVE */
-        @media (max-width: 1024px) {
-            .admin-sidebar-modern { transform: translateX(-100%); }
-            .admin-sidebar-modern.sidebar-open { transform: translateX(0); box-shadow: 4px 0 25px rgba(0, 0, 0, 0.6); }
-            .admin-main-wrapper { margin-left: 0; }
-            .mobile-menu-toggle { display: flex; }
-            .topbar-search { display: none; }
+        /* ==========================================================================
+           RESPONSIVE ADMIN OVERHAUL (100% MOBILE, TABLET & DESKTOP SUITE)
+           ========================================================================== */
+
+        /* BACKDROP FOR MOBILE SIDEBAR */
+        .sidebar-backdrop {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            z-index: 999;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.35s ease;
         }
-        
-        @media (max-width: 768px) {
-            .admin-topbar { padding: 0 1.25rem; height: 75px; }
-            .admin-content { padding: 1.75rem 1.25rem; }
-            .topbar-user .user-info { display: none; }
-            .topbar-notification { display: none; }
-            .admin-sidebar-modern { width: 260px; }
+
+        .sidebar-backdrop.active {
+            opacity: 1;
+            pointer-events: auto;
         }
-        
-        @media (max-width: 640px) {
-            .admin-sidebar-modern { width: 100%; max-width: 270px; }
-            .breadcrumb-current { font-size: 0.85rem; }
+
+        /* TABLE WRAPPERS FOR FLUID HORIZONTAL SCROLL */
+        .admin-table-container {
+            width: 100% !important;
+            overflow-x: auto !important;
+            -webkit-overflow-scrolling: touch;
+            border-radius: 16px;
+            border: 1px solid var(--border-color);
+            background: rgba(10, 10, 15, 0.6);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+            margin-bottom: 1.5rem;
+        }
+
+        .admin-table {
+            width: 100%;
+            min-width: 650px;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        /* PAGE HEADERS */
+        .admin-page-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
         }
 
         /* DYNAMIC TOAST ANIMATIONS */
@@ -401,9 +430,147 @@
         .toast-fade-out {
             animation: toastSlideOut 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
         }
+
+        /* RESPONSIVE MEDIA QUERIES */
+        @media (max-width: 1024px) {
+            .admin-sidebar-modern {
+                transform: translateX(-100%);
+                box-shadow: none;
+            }
+
+            .admin-sidebar-modern.sidebar-open {
+                transform: translateX(0);
+                box-shadow: 10px 0 40px rgba(0, 0, 0, 0.85);
+            }
+
+            .admin-main-wrapper {
+                margin-left: 0 !important;
+            }
+
+            .mobile-menu-toggle {
+                display: flex !important;
+            }
+
+            .topbar-search {
+                display: none;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .admin-topbar {
+                padding: 0 1.25rem;
+                height: 72px;
+            }
+
+            .admin-content {
+                padding: 1.5rem 1rem;
+            }
+
+            .admin-card {
+                padding: 1.35rem 1.15rem;
+                border-radius: 16px;
+                margin-bottom: 1.25rem;
+            }
+
+            .admin-card-title {
+                font-size: 1.1rem;
+                margin-bottom: 1.25rem;
+                gap: 0.6rem;
+            }
+
+            .admin-page-header {
+                flex-direction: column;
+                align-items: flex-start !important;
+                gap: 1rem;
+                margin-bottom: 1.5rem;
+            }
+
+            .admin-page-header .btn-primary {
+                width: 100%;
+                justify-content: center;
+            }
+
+            /* Responsive Form Grid Collapse */
+            .form-row,
+            .admin-grid-2col,
+            .admin-grid-3col,
+            form div[style*="grid-template-columns"] {
+                grid-template-columns: 1fr !important;
+                gap: 1rem !important;
+            }
+
+            .project-stats-bar,
+            .travel-stats-bar {
+                flex-direction: column;
+                gap: 1rem;
+                padding: 1rem;
+            }
+
+            .topbar-user .user-info {
+                display: none;
+            }
+
+            .topbar-notification {
+                display: none;
+            }
+
+            .admin-sidebar-modern {
+                width: 280px;
+            }
+
+            .btn-primary {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .form-actions-row {
+                flex-direction: column-reverse;
+                gap: 0.75rem;
+                width: 100%;
+            }
+
+            .form-actions-row .btn-primary,
+            .form-actions-row .btn-action-text {
+                width: 100%;
+                text-align: center;
+                justify-content: center;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .admin-sidebar-modern {
+                width: 85vw;
+            }
+
+            .admin-topbar {
+                padding: 0 0.85rem;
+            }
+
+            .admin-content {
+                padding: 1rem 0.75rem;
+            }
+
+            .admin-card {
+                padding: 1.1rem 0.9rem;
+            }
+
+            .breadcrumb-current {
+                font-size: 0.82rem;
+            }
+
+            input[type="file"]::file-selector-button,
+            input[type="file"]::-webkit-file-upload-button {
+                padding: 0.45rem 0.75rem;
+                font-size: 0.78rem;
+                margin-right: 0.5rem;
+            }
+        }
     </style>
 </head>
 <body class="admin-body">
+
+    <!-- Mobile Sidebar Backdrop Overlay -->
+    <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
 
     <!-- Sidebar Navigation -->
     <aside class="admin-sidebar-modern" id="adminSidebar">
@@ -606,9 +773,41 @@
     </div>
 
     <script>
-        // Mobile menu toggle
-        document.getElementById('mobileMenuToggle')?.addEventListener('click', function() {
-            document.getElementById('adminSidebar').classList.toggle('sidebar-open');
+        // Mobile sidebar & backdrop overlay toggle
+        const adminSidebar = document.getElementById('adminSidebar');
+        const sidebarBackdrop = document.getElementById('sidebarBackdrop');
+        const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+
+        function openSidebar() {
+            adminSidebar?.classList.add('sidebar-open');
+            sidebarBackdrop?.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeSidebar() {
+            adminSidebar?.classList.remove('sidebar-open');
+            sidebarBackdrop?.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        mobileMenuToggle?.addEventListener('click', function(e) {
+            e.stopPropagation();
+            if (adminSidebar?.classList.contains('sidebar-open')) {
+                closeSidebar();
+            } else {
+                openSidebar();
+            }
+        });
+
+        sidebarBackdrop?.addEventListener('click', closeSidebar);
+
+        // Auto-close sidebar on mobile link navigation
+        document.querySelectorAll('.admin-nav-link, .sidebar-footer-link').forEach(link => {
+            link.addEventListener('click', function() {
+                if (window.innerWidth <= 1024) {
+                    closeSidebar();
+                }
+            });
         });
 
         // Floating Toast Notification

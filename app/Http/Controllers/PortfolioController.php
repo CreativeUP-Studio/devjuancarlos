@@ -48,13 +48,35 @@ class PortfolioController extends Controller
     public function showTravel(Travel $travel)
     {
         $profile = Profile::first();
+        
+        // Fetch all travels ordered for cyclic prev/next navigation
+        $allTravels = Travel::orderBy('order')->orderBy('created_at', 'desc')->get();
+        $previousTravel = null;
+        $nextTravel = null;
+
+        if ($allTravels->count() > 1) {
+            $currentIndex = $allTravels->search(function($item) use ($travel) {
+                return $item->id === $travel->id;
+            });
+
+            if ($currentIndex !== false) {
+                $prevIndex = ($currentIndex - 1 + $allTravels->count()) % $allTravels->count();
+                $nextIndex = ($currentIndex + 1) % $allTravels->count();
+                $previousTravel = $allTravels->get($prevIndex);
+                $nextTravel = $allTravels->get($nextIndex);
+            }
+        } else {
+            $previousTravel = $travel;
+            $nextTravel = $travel;
+        }
+
         $otherTravels = Travel::where('id', '!=', $travel->id)
             ->orderBy('order')
             ->orderBy('created_at', 'desc')
             ->take(3)
             ->get();
 
-        return view('travels.show', compact('profile', 'travel', 'otherTravels'));
+        return view('travels.show', compact('profile', 'travel', 'previousTravel', 'nextTravel', 'otherTravels'));
     }
 
     /**

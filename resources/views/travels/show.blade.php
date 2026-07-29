@@ -588,6 +588,59 @@
                 font-size: 1.2rem;
             }
         }
+
+        /* ----------------------------------------------------
+           5. FLOATING SCREEN CORNER ARROW BUTTONS (PLAY/PAUSE CIRCULAR GLASS DESIGN)
+        ---------------------------------------------------- */
+        .travel-nav-arrow {
+            position: fixed;
+            bottom: 2.2rem;
+            z-index: 1000;
+            width: 58px;
+            height: 58px;
+            border-radius: 50%;
+            background: rgba(0, 0, 0, 0.55);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: #ffffff;
+            font-size: 1.35rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
+            transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .travel-nav-arrow:hover {
+            transform: scale(1.08);
+            background: rgba(255, 255, 255, 0.18);
+            border-color: rgba(255, 255, 255, 0.7);
+            color: #ffffff;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7), 0 0 20px rgba(255, 255, 255, 0.3);
+        }
+
+        .travel-nav-arrow.prev {
+            left: 2.2rem;
+        }
+
+        .travel-nav-arrow.next {
+            right: 2.2rem;
+        }
+
+        @media (max-width: 768px) {
+            .travel-nav-arrow {
+                bottom: 1.25rem;
+                width: 46px;
+                height: 46px;
+                font-size: 1.1rem;
+            }
+            .travel-nav-arrow.prev { left: 1rem; }
+            .travel-nav-arrow.next { right: 1rem; }
+        }
     </style>
 </head>
 <body>
@@ -664,6 +717,7 @@
                         <i class="fa-solid fa-map-location-dot"></i>
                     </div>
                 @endif
+
             </div>
 
             <!-- Right Side: Details -->
@@ -718,9 +772,33 @@
         </div>
     </header>
 
-    <!-- JS Script (Music Audio Player + Minimalist Play/Pause Video Controls) -->
+    <!-- Floating Bottom Navigation Arrows (Anterior / Siguiente) -->
+    @if(isset($previousTravel) && $previousTravel)
+        <a href="{{ route('portfolio.travels.show', $previousTravel) }}" class="travel-nav-arrow prev" title="Anterior Destino: {{ $previousTravel->title }}" aria-label="Anterior">
+            <i class="fa-solid fa-arrow-left"></i>
+        </a>
+    @endif
+
+    @if(isset($nextTravel) && $nextTravel)
+        <a href="{{ route('portfolio.travels.show', $nextTravel) }}" class="travel-nav-arrow next" title="Siguiente Destino: {{ $nextTravel->title }}" aria-label="Siguiente">
+            <i class="fa-solid fa-arrow-right"></i>
+        </a>
+    @endif
+
+    <!-- JS Script (Music Audio Player + Minimalist Play/Pause Video Controls + Prev/Next Arrow Navigation) -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // Keyboard Arrow Left/Right Navigation
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'ArrowLeft') {
+                    const prevBtn = document.querySelector('.travel-nav-arrow.prev');
+                    if (prevBtn) prevBtn.click();
+                } else if (e.key === 'ArrowRight') {
+                    const nextBtn = document.querySelector('.travel-nav-arrow.next');
+                    if (nextBtn) nextBtn.click();
+                }
+            });
+
             // Background Audio Music Button & Autoplay Logic
             const musicBtn = document.getElementById('travelMusicBtn');
             const audioTrack = document.getElementById('travelAudioTrack');
@@ -735,7 +813,6 @@
                         }
                     }).catch(err => {
                         console.log('Autoplay deferred:', err);
-                        // Trigger on first user interaction if browser blocked instant autoplay
                         const unlockAudio = function() {
                             audioTrack.play().then(() => {
                                 if (musicBtn) {
@@ -749,7 +826,6 @@
                     });
                 }
 
-                // Autoplay music automatically if photo-only mode
                 if (isImageOnlyMode) {
                     startAudio();
                 }
@@ -812,7 +888,6 @@
                 video.addEventListener('play', updatePlayState);
                 video.addEventListener('pause', updatePlayState);
 
-                // Initial sync
                 updatePlayState();
             }
         });
