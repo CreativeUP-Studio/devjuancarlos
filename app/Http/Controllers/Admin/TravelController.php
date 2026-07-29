@@ -6,8 +6,27 @@ use App\Http\Controllers\Controller;
 use App\Models\Travel;
 use Illuminate\Http\Request;
 
+use Illuminate\Support\Facades\Storage;
+
 class TravelController extends Controller
 {
+    /**
+     * Helper to safely delete stored media files (works for direct uploads/ and symlinked storage/)
+     */
+    private function deleteFile(?string $path): void
+    {
+        if (!$path) return;
+
+        if (file_exists(public_path($path))) {
+            @unlink(public_path($path));
+        }
+
+        $relativeStoragePath = str_replace('storage/', '', $path);
+        if (Storage::disk('public')->exists($relativeStoragePath)) {
+            Storage::disk('public')->delete($relativeStoragePath);
+        }
+    }
+
     /**
      * Display a listing of the travels.
      */
@@ -73,28 +92,28 @@ class TravelController extends Controller
             $data['meta_2_icon'] = 'fa-solid fa-camera';
         }
 
-        // Handle Background Image Upload
+        // Handle Background Image Upload via Storage Symlink
         if ($request->hasFile('image')) {
             $image = $request->file('image');
             $imageName = 'travel_' . time() . '.' . $image->getClientOriginalExtension();
-            $image->move(public_path('uploads/travels'), $imageName);
-            $data['image_path'] = 'uploads/travels/' . $imageName;
+            $storedPath = $image->storeAs('uploads/travels', $imageName, 'public');
+            $data['image_path'] = 'storage/' . $storedPath;
         }
 
-        // Handle Audio Upload
+        // Handle Audio Upload via Storage Symlink
         if ($request->hasFile('audio')) {
             $audio = $request->file('audio');
             $audioName = 'audio_' . time() . '.' . $audio->getClientOriginalExtension();
-            $audio->move(public_path('uploads/audio'), $audioName);
-            $data['audio_path'] = 'uploads/audio/' . $audioName;
+            $storedPath = $audio->storeAs('uploads/audio', $audioName, 'public');
+            $data['audio_path'] = 'storage/' . $storedPath;
         }
 
-        // Handle Video Upload
+        // Handle Video Upload via Storage Symlink
         if ($request->hasFile('video')) {
             $video = $request->file('video');
             $videoName = 'video_' . time() . '.' . $video->getClientOriginalExtension();
-            $video->move(public_path('uploads/videos'), $videoName);
-            $data['video_path'] = 'uploads/videos/' . $videoName;
+            $storedPath = $video->storeAs('uploads/videos', $videoName, 'public');
+            $data['video_path'] = 'storage/' . $storedPath;
         }
 
         Travel::create($data);
@@ -161,16 +180,12 @@ class TravelController extends Controller
 
         // Handle File Deletions requested by user
         if ($request->boolean('delete_image')) {
-            if ($travel->image_path && file_exists(public_path($travel->image_path))) {
-                @unlink(public_path($travel->image_path));
-            }
+            $this->deleteFile($travel->image_path);
             $data['image_path'] = null;
         }
 
         if ($request->boolean('delete_video')) {
-            if ($travel->video_path && file_exists(public_path($travel->video_path))) {
-                @unlink(public_path($travel->video_path));
-            }
+            $this->deleteFile($travel->video_path);
             $data['video_path'] = null;
             if (isset($data['media_type']) && $data['media_type'] === 'video') {
                 $data['media_type'] = 'image';
@@ -178,43 +193,35 @@ class TravelController extends Controller
         }
 
         if ($request->boolean('delete_audio')) {
-            if ($travel->audio_path && file_exists(public_path($travel->audio_path))) {
-                @unlink(public_path($travel->audio_path));
-            }
+            $this->deleteFile($travel->audio_path);
             $data['audio_path'] = null;
         }
 
         // Handle Background Image Upload
         if ($request->hasFile('image')) {
-            if ($travel->image_path && file_exists(public_path($travel->image_path))) {
-                @unlink(public_path($travel->image_path));
-            }
+            $this->deleteFile($travel->image_path);
             $image = $request->file('image');
             $imageName = 'travel_' . time() . '.' . $image->getClientOriginalExtension();
-            $image->move(public_path('uploads/travels'), $imageName);
-            $data['image_path'] = 'uploads/travels/' . $imageName;
+            $storedPath = $image->storeAs('uploads/travels', $imageName, 'public');
+            $data['image_path'] = 'storage/' . $storedPath;
         }
 
         // Handle Audio Upload
         if ($request->hasFile('audio')) {
-            if ($travel->audio_path && file_exists(public_path($travel->audio_path))) {
-                @unlink(public_path($travel->audio_path));
-            }
+            $this->deleteFile($travel->audio_path);
             $audio = $request->file('audio');
             $audioName = 'audio_' . time() . '.' . $audio->getClientOriginalExtension();
-            $audio->move(public_path('uploads/audio'), $audioName);
-            $data['audio_path'] = 'uploads/audio/' . $audioName;
+            $storedPath = $audio->storeAs('uploads/audio', $audioName, 'public');
+            $data['audio_path'] = 'storage/' . $storedPath;
         }
 
         // Handle Video Upload
         if ($request->hasFile('video')) {
-            if ($travel->video_path && file_exists(public_path($travel->video_path))) {
-                @unlink(public_path($travel->video_path));
-            }
+            $this->deleteFile($travel->video_path);
             $video = $request->file('video');
             $videoName = 'video_' . time() . '.' . $video->getClientOriginalExtension();
-            $video->move(public_path('uploads/videos'), $videoName);
-            $data['video_path'] = 'uploads/videos/' . $videoName;
+            $storedPath = $video->storeAs('uploads/videos', $videoName, 'public');
+            $data['video_path'] = 'storage/' . $storedPath;
         }
 
         $travel->update($data);
@@ -227,9 +234,9 @@ class TravelController extends Controller
      */
     public function destroy(Travel $travel)
     {
-        if ($travel->image_path && file_exists(public_path($travel->image_path))) {
-            @unlink(public_path($travel->image_path));
-        }
+        $this->deleteFile($travel->image_path);
+        $this->deleteFile($travel->video_path);
+        $this->deleteFile($travel->audio_path);
 
         $travel->delete();
 

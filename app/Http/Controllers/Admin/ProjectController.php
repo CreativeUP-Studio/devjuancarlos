@@ -6,8 +6,22 @@ use App\Http\Controllers\Controller;
 use App\Models\Project;
 use Illuminate\Http\Request;
 
+use Illuminate\Support\Facades\Storage;
+
 class ProjectController extends Controller
 {
+    private function deleteFile(?string $path): void
+    {
+        if (!$path) return;
+        if (file_exists(public_path($path))) {
+            @unlink(public_path($path));
+        }
+        $relativeStoragePath = str_replace('storage/', '', $path);
+        if (Storage::disk('public')->exists($relativeStoragePath)) {
+            Storage::disk('public')->delete($relativeStoragePath);
+        }
+    }
+
     /**
      * Display a listing of the resource.
      */
@@ -47,8 +61,8 @@ class ProjectController extends Controller
         if ($request->hasFile('image')) {
             $image = $request->file('image');
             $imageName = 'project_' . time() . '.' . $image->getClientOriginalExtension();
-            $image->move(public_path('uploads/projects'), $imageName);
-            $data['image_path'] = 'uploads/projects/' . $imageName;
+            $storedPath = $image->storeAs('uploads/projects', $imageName, 'public');
+            $data['image_path'] = 'storage/' . $storedPath;
         }
 
         Project::create($data);
@@ -84,15 +98,11 @@ class ProjectController extends Controller
         $data = $request->only(['title', 'description', 'steps', 'features', 'tech_stack', 'project_url', 'github_url', 'order']);
 
         if ($request->hasFile('image')) {
-            // Delete old image if it exists
-            if ($project->image_path && file_exists(public_path($project->image_path))) {
-                @unlink(public_path($project->image_path));
-            }
-
+            $this->deleteFile($project->image_path);
             $image = $request->file('image');
             $imageName = 'project_' . time() . '.' . $image->getClientOriginalExtension();
-            $image->move(public_path('uploads/projects'), $imageName);
-            $data['image_path'] = 'uploads/projects/' . $imageName;
+            $storedPath = $image->storeAs('uploads/projects', $imageName, 'public');
+            $data['image_path'] = 'storage/' . $storedPath;
         }
 
         $project->update($data);
@@ -105,10 +115,7 @@ class ProjectController extends Controller
      */
     public function destroy(Project $project)
     {
-        if ($project->image_path && file_exists(public_path($project->image_path))) {
-            @unlink(public_path($project->image_path));
-        }
-
+        $this->deleteFile($project->image_path);
         $project->delete();
 
         return redirect()->route('admin.projects.index')->with('success', 'El proyecto ha sido eliminado exitosamente.');

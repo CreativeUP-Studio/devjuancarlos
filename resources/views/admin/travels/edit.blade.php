@@ -608,7 +608,7 @@
         }
     }
 
-    // AJAX Form Upload with Ultra-Smooth Progress Bar Interpolation
+    // AJAX Form Upload with Progressive 60fps MB Counting & Smooth Fill
     document.addEventListener('DOMContentLoaded', function() {
         const form = document.getElementById('travelEditForm');
         const modal = document.getElementById('uploadProgressModal');
@@ -618,6 +618,12 @@
 
         if (form && modal) {
             form.addEventListener('submit', function(e) {
+                // Validate HTML5 inputs before showing progress modal
+                if (!form.checkValidity()) {
+                    form.reportValidity();
+                    return;
+                }
+
                 e.preventDefault();
 
                 const formData = new FormData(form);
@@ -626,67 +632,92 @@
                 modal.style.display = 'flex';
                 barFill.style.width = '0%';
                 percentText.textContent = '0%';
-                bytesText.textContent = 'Iniciando transferencia...';
+                bytesText.textContent = 'Calculando transferencia...';
 
                 let displayPercent = 0;
                 let targetPercent = 0;
                 let totalBytes = 0;
                 let loadedBytes = 0;
+                let isComplete = false;
 
                 // Smooth 60fps Interpolation Timer
                 const animInterval = setInterval(function() {
+                    if (isComplete) return;
+
+                    // Interpolate displayPercent smoothly towards targetPercent
                     if (displayPercent < targetPercent) {
-                        displayPercent += (targetPercent - displayPercent) * 0.12 + 0.15;
+                        displayPercent += Math.max(0.4, (targetPercent - displayPercent) * 0.18);
                         if (displayPercent > targetPercent) displayPercent = targetPercent;
+                    }
 
-                        const val = Math.min(100, Math.floor(displayPercent));
-                        barFill.style.width = displayPercent.toFixed(1) + '%';
-                        percentText.textContent = val + '%';
+                    const val = Math.min(99, Math.floor(displayPercent));
+                    barFill.style.width = displayPercent.toFixed(1) + '%';
+                    percentText.textContent = val + '%';
 
-                        if (totalBytes > 0) {
-                            const currentLoadedBytes = (loadedBytes * (displayPercent / (targetPercent || 100)));
-                            const currentMB = (currentLoadedBytes / (1024 * 1024)).toFixed(1);
-                            const totalMB = (totalBytes / (1024 * 1024)).toFixed(1);
-                            bytesText.textContent = currentMB + ' MB / ' + totalMB + ' MB';
-                        }
+                    if (totalBytes > 0) {
+                        const currentMB = ((totalBytes * (displayPercent / 100)) / (1024 * 1024)).toFixed(1);
+                        const totalMB = (totalBytes / (1024 * 1024)).toFixed(1);
+                        bytesText.textContent = currentMB + ' MB / ' + totalMB + ' MB';
+                    } else {
+                        bytesText.textContent = 'Procesando datos en el servidor...';
                     }
                 }, 30);
 
                 xhr.upload.addEventListener('progress', function(event) {
-                    if (event.lengthComputable) {
+                    if (event.lengthComputable && event.total > 0) {
                         totalBytes = event.total;
                         loadedBytes = event.loaded;
-                        targetPercent = Math.min(96, Math.round((event.loaded / event.total) * 100));
+                        // Map physical upload phase to 0% -> 90%
+                        const realProgress = (event.loaded / event.total) * 90;
+                        targetPercent = Math.max(targetPercent, Math.round(realProgress));
                     }
                 });
 
-                xhr.onreadystatechange = function() {
-                    if (xhr.readyState === XMLHttpRequest.DONE) {
-                        if (xhr.status === 200 || xhr.status === 302 || xhr.responseURL) {
-                            targetPercent = 100;
-                            const finishTimer = setInterval(function() {
-                                if (displayPercent >= 99) {
-                                    clearInterval(animInterval);
-                                    clearInterval(finishTimer);
-                                    barFill.style.width = '100%';
-                                    percentText.textContent = '100%';
-                                    if (totalBytes > 0) {
-                                        const totalMB = (totalBytes / (1024 * 1024)).toFixed(1);
-                                        bytesText.textContent = totalMB + ' MB / ' + totalMB + ' MB';
-                                    } else {
-                                        bytesText.textContent = '¡Proceso completado!';
-                                    }
-                                    setTimeout(function() {
-                                        window.location.href = "{{ route('admin.travels.index') }}";
-                                    }, 400);
-                                }
-                            }, 30);
+                xhr.onload = function() {
+                    isComplete = true;
+                    clearInterval(animInterval);
+
+                    if (xhr.status >= 200 && xhr.status < 350) {
+                        barFill.style.width = '100%';
+                        percentText.textContent = '100%';
+
+                        if (totalBytes > 0) {
+                            const totalMB = (totalBytes / (1024 * 1024)).toFixed(1);
+                            bytesText.textContent = totalMB + ' MB / ' + totalMB + ' MB - ¡Actualizado con éxito!';
                         } else {
-                            clearInterval(animInterval);
-                            alert('Ocurrió un error al procesar la actualización. Por favor revisa los datos.');
-                            modal.style.display = 'none';
+                            bytesText.textContent = '¡Proceso completado!';
                         }
+
+                        setTimeout(function() {
+                            window.location.href = "{{ route('admin.travels.index') }}";
+                        }, 450);
+                    } else if (xhr.status === 422) {
+                        modal.style.display = 'none';
+                        let errorMsg = 'Error de validación:\n';
+                        try {
+                            const res = JSON.parse(xhr.responseText);
+                            if (res.errors) {
+                                for (let field in res.errors) {
+                                    errorMsg += '• ' + res.errors[field].join(', ') + '\n';
+                                }
+                            } else if (res.message) {
+                                errorMsg += '• ' + res.message;
+                            }
+                        } catch(err) {
+                            errorMsg += 'Revisa los campos requeridos del formulario.';
+                        }
+                        alert(errorMsg);
+                    } else {
+                        modal.style.display = 'none';
+                        alert('Ocurrió un error al procesar la actualización (Código HTTP ' + xhr.status + ').');
                     }
+                };
+
+                xhr.onerror = function() {
+                    isComplete = true;
+                    clearInterval(animInterval);
+                    modal.style.display = 'none';
+                    alert('Error de conexión al intentar enviar los archivos.');
                 };
 
                 xhr.open('POST', form.action, true);

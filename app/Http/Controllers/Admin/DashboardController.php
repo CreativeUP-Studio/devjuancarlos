@@ -13,6 +13,18 @@ use Illuminate\Support\Facades\Storage;
 
 class DashboardController extends Controller
 {
+    private function deleteFile(?string $path): void
+    {
+        if (!$path) return;
+        if (file_exists(public_path($path))) {
+            @unlink(public_path($path));
+        }
+        $relativeStoragePath = str_replace('storage/', '', $path);
+        if (Storage::disk('public')->exists($relativeStoragePath)) {
+            Storage::disk('public')->delete($relativeStoragePath);
+        }
+    }
+
     /**
      * Display the admin dashboard with statistics and profile settings.
      */
@@ -25,17 +37,14 @@ class DashboardController extends Controller
             'skills_count' => Skill::count(),
             'travels_count' => Travel::count(),
             'messages_count' => Message::count(),
-            'unread_messages' => Message::where('is_read', false)->count(),
+            'unread_messages_count' => Message::where('is_read', false)->count(),
         ];
 
-        // Fetch recent messages for BI (Bandeja de Entrada)
-        $recentMessages = Message::orderBy('created_at', 'desc')->take(5)->get();
-
-        return view('admin.profile', compact('profile', 'stats', 'recentMessages'));
+        return view('admin.profile', compact('profile', 'stats'));
     }
 
     /**
-     * Update the profile settings (Header / basic info).
+     * Update main profile info and header options.
      */
     public function updateProfile(Request $request)
     {
@@ -51,48 +60,51 @@ class DashboardController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'title' => ['required', 'string', 'max:255'],
             'bio' => ['required', 'string'],
-            'email' => ['nullable', 'email', 'max:255'],
-            'phone' => ['nullable', 'string', 'max:255'],
-            'location' => ['nullable', 'string', 'max:255'],
-            'github_url' => ['nullable', 'url', 'max:255'],
-            'linkedin_url' => ['nullable', 'url', 'max:255'],
-            'cv' => ['nullable', 'mimes:pdf,docx,doc', 'max:10240'],
+            'cv' => ['nullable', 'file', 'mimes:pdf,doc,docx', 'max:10240'],
             'hero_bg_image' => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif,webp', 'max:4096'],
-            'hero_status_text' => ['nullable', 'string', 'max:255'],
-            'hero_float_icon' => ['nullable', 'string', 'max:255'],
-            'hero_float_label' => ['nullable', 'string', 'max:255'],
-            'hero_float_value' => ['nullable', 'string', 'max:255'],
+            'hero_badge' => ['nullable', 'string', 'max:255'],
+            'hero_headline' => ['nullable', 'string', 'max:255'],
+            'hero_subheadline' => ['nullable', 'string', 'max:255'],
+            'location_tag' => ['nullable', 'string', 'max:255'],
+            'status_tag' => ['nullable', 'string', 'max:255'],
+            'stat_1_number' => ['nullable', 'string', 'max:50'],
+            'stat_1_label' => ['nullable', 'string', 'max:255'],
+            'stat_2_number' => ['nullable', 'string', 'max:50'],
+            'stat_2_label' => ['nullable', 'string', 'max:255'],
+            'stat_3_number' => ['nullable', 'string', 'max:50'],
+            'stat_3_label' => ['nullable', 'string', 'max:255'],
+            'social_linkedin' => ['nullable', 'url', 'max:255'],
+            'social_github' => ['nullable', 'url', 'max:255'],
+            'social_instagram' => ['nullable', 'url', 'max:255'],
+            'social_youtube' => ['nullable', 'url', 'max:255'],
         ]);
 
         $data = $request->only([
-            'name', 'title', 'bio', 'email', 'phone', 'location', 'github_url', 'linkedin_url',
-            'hero_status_text', 'hero_float_icon', 'hero_float_label', 'hero_float_value'
+            'name', 'title', 'bio', 
+            'hero_badge', 'hero_headline', 'hero_subheadline', 
+            'location_tag', 'status_tag',
+            'stat_1_number', 'stat_1_label',
+            'stat_2_number', 'stat_2_label',
+            'stat_3_number', 'stat_3_label',
+            'social_linkedin', 'social_github', 'social_instagram', 'social_youtube'
         ]);
 
-        // Upload CV File
+        // Upload CV File via Storage Symlink
         if ($request->hasFile('cv')) {
-            // Delete old CV if it exists
-            if ($profile->cv_path && file_exists(public_path($profile->cv_path))) {
-                @unlink(public_path($profile->cv_path));
-            }
-
+            $this->deleteFile($profile->cv_path);
             $cv = $request->file('cv');
             $cvName = 'cv_' . time() . '.' . $cv->getClientOriginalExtension();
-            $cv->move(public_path('uploads'), $cvName);
-            $data['cv_path'] = 'uploads/' . $cvName;
+            $storedPath = $cv->storeAs('uploads', $cvName, 'public');
+            $data['cv_path'] = 'storage/' . $storedPath;
         }
 
-        // Upload Hero Background Image
+        // Upload Hero Background Image via Storage Symlink
         if ($request->hasFile('hero_bg_image')) {
-            // Delete old image if it exists
-            if ($profile->hero_bg_image && file_exists(public_path($profile->hero_bg_image))) {
-                @unlink(public_path($profile->hero_bg_image));
-            }
-
+            $this->deleteFile($profile->hero_bg_image);
             $heroBgImg = $request->file('hero_bg_image');
             $heroBgName = 'hero_bg_' . time() . '.' . $heroBgImg->getClientOriginalExtension();
-            $heroBgImg->move(public_path('uploads'), $heroBgName);
-            $data['hero_bg_image'] = 'uploads/' . $heroBgName;
+            $storedPath = $heroBgImg->storeAs('uploads', $heroBgName, 'public');
+            $data['hero_bg_image'] = 'storage/' . $storedPath;
         }
 
         if ($isNew) {
@@ -155,9 +167,7 @@ class DashboardController extends Controller
             $updatedBackgrounds = [];
             foreach ($currentBackgrounds as $bg) {
                 if (in_array($bg, $request->delete_backgrounds)) {
-                    if (file_exists(public_path($bg))) {
-                        @unlink(public_path($bg));
-                    }
+                    $this->deleteFile($bg);
                 } else {
                     $updatedBackgrounds[] = $bg;
                 }
@@ -165,53 +175,42 @@ class DashboardController extends Controller
             $currentBackgrounds = $updatedBackgrounds;
         }
 
-        // Upload new biography backgrounds
+        // Upload new biography backgrounds via Storage Symlink
         if ($request->hasFile('bio_backgrounds')) {
-            // Create folder if it doesn't exist
-            if (!file_exists(public_path('uploads/bio_backgrounds'))) {
-                @mkdir(public_path('uploads/bio_backgrounds'), 0777, true);
-            }
-
             foreach ($request->file('bio_backgrounds') as $file) {
                 $fileName = 'bio_bg_' . uniqid() . '_' . time() . '.' . $file->getClientOriginalExtension();
-                $file->move(public_path('uploads/bio_backgrounds'), $fileName);
-                $currentBackgrounds[] = 'uploads/bio_backgrounds/' . $fileName;
+                $storedPath = $file->storeAs('uploads/bio_backgrounds', $fileName, 'public');
+                $currentBackgrounds[] = 'storage/' . $storedPath;
             }
         }
 
         $data['bio_backgrounds'] = $currentBackgrounds;
 
-        // Upload Profile Photo (Biography Main Image)
+        // Upload Profile Photo (Biography Main Image) via Storage Symlink
         if ($request->hasFile('photo')) {
-            if ($profile->photo_path && file_exists(public_path($profile->photo_path))) {
-                @unlink(public_path($profile->photo_path));
-            }
+            $this->deleteFile($profile->photo_path);
             $photo = $request->file('photo');
             $photoName = 'profile_' . time() . '.' . $photo->getClientOriginalExtension();
-            $photo->move(public_path('uploads'), $photoName);
-            $data['photo_path'] = 'uploads/' . $photoName;
+            $storedPath = $photo->storeAs('uploads', $photoName, 'public');
+            $data['photo_path'] = 'storage/' . $storedPath;
         }
 
-        // Upload Workspace Image
+        // Upload Workspace Image via Storage Symlink
         if ($request->hasFile('workspace_image')) {
-            if ($profile->workspace_image && file_exists(public_path($profile->workspace_image))) {
-                @unlink(public_path($profile->workspace_image));
-            }
+            $this->deleteFile($profile->workspace_image);
             $workspaceImg = $request->file('workspace_image');
             $workspaceName = 'workspace_' . time() . '.' . $workspaceImg->getClientOriginalExtension();
-            $workspaceImg->move(public_path('uploads'), $workspaceName);
-            $data['workspace_image'] = 'uploads/' . $workspaceName;
+            $storedPath = $workspaceImg->storeAs('uploads', $workspaceName, 'public');
+            $data['workspace_image'] = 'storage/' . $storedPath;
         }
 
-        // Upload Tech Image
+        // Upload Tech Image via Storage Symlink
         if ($request->hasFile('tech_image')) {
-            if ($profile->tech_image && file_exists(public_path($profile->tech_image))) {
-                @unlink(public_path($profile->tech_image));
-            }
+            $this->deleteFile($profile->tech_image);
             $techImg = $request->file('tech_image');
             $techName = 'tech_' . time() . '.' . $techImg->getClientOriginalExtension();
-            $techImg->move(public_path('uploads'), $techName);
-            $data['tech_image'] = 'uploads/' . $techName;
+            $storedPath = $techImg->storeAs('uploads', $techName, 'public');
+            $data['tech_image'] = 'storage/' . $storedPath;
         }
 
         if ($isNew) {

@@ -99,25 +99,27 @@ class SkillController extends Controller
             if ($profile->tech_image && file_exists(public_path($profile->tech_image))) {
                 @unlink(public_path($profile->tech_image));
             }
+            $relativeStoragePath = str_replace('storage/', '', $profile->tech_image ?? '');
+            if ($relativeStoragePath && \Illuminate\Support\Facades\Storage::disk('public')->exists($relativeStoragePath)) {
+                \Illuminate\Support\Facades\Storage::disk('public')->delete($relativeStoragePath);
+            }
             $profile->tech_image = null;
         }
 
-        // Upload new background image
+        // Upload new background image via Storage Symlink
         if ($request->hasFile('tech_image')) {
-            // Delete previous image if exists
             if ($profile->tech_image && file_exists(public_path($profile->tech_image))) {
                 @unlink(public_path($profile->tech_image));
             }
-
-            // Create uploads folder if it doesn't exist
-            if (!file_exists(public_path('uploads'))) {
-                @mkdir(public_path('uploads'), 0777, true);
+            $relativeStoragePath = str_replace('storage/', '', $profile->tech_image ?? '');
+            if ($relativeStoragePath && \Illuminate\Support\Facades\Storage::disk('public')->exists($relativeStoragePath)) {
+                \Illuminate\Support\Facades\Storage::disk('public')->delete($relativeStoragePath);
             }
 
             $file = $request->file('tech_image');
             $fileName = 'tech_bg_' . time() . '.' . $file->getClientOriginalExtension();
-            $file->move(public_path('uploads'), $fileName);
-            $profile->tech_image = 'uploads/' . $fileName;
+            $storedPath = $file->storeAs('uploads', $fileName, 'public');
+            $profile->tech_image = 'storage/' . $storedPath;
         }
 
         if (!$profile->exists) {
