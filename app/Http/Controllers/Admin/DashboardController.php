@@ -58,10 +58,15 @@ class DashboardController extends Controller
             'linkedin_url' => ['nullable', 'url', 'max:255'],
             'cv' => ['nullable', 'mimes:pdf,docx,doc', 'max:10240'],
             'hero_bg_image' => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif,webp', 'max:4096'],
+            'hero_status_text' => ['nullable', 'string', 'max:255'],
+            'hero_float_icon' => ['nullable', 'string', 'max:255'],
+            'hero_float_label' => ['nullable', 'string', 'max:255'],
+            'hero_float_value' => ['nullable', 'string', 'max:255'],
         ]);
 
         $data = $request->only([
-            'name', 'title', 'bio', 'email', 'phone', 'location', 'github_url', 'linkedin_url'
+            'name', 'title', 'bio', 'email', 'phone', 'location', 'github_url', 'linkedin_url',
+            'hero_status_text', 'hero_float_icon', 'hero_float_label', 'hero_float_value'
         ]);
 
         // Upload CV File
@@ -132,12 +137,49 @@ class DashboardController extends Controller
             'photo' => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif,webp', 'max:4096'],
             'workspace_image' => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif,webp', 'max:4096'],
             'tech_image' => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif,webp', 'max:4096'],
+            'bio_backgrounds' => ['nullable', 'array'],
+            'bio_backgrounds.*' => ['image', 'mimes:jpeg,png,jpg,gif,webp', 'max:4096'],
+            'delete_backgrounds' => ['nullable', 'array'],
         ]);
 
         $data = $request->only([
             'bio_tag', 'bio_title', 'bio_description',
             'workspace_title', 'workspace_desc', 'tech_title', 'tech_desc'
         ]);
+
+        // Manage bio backgrounds (multiple uploads and deletions)
+        $currentBackgrounds = $profile->bio_backgrounds ?? [];
+
+        // Delete requested backgrounds
+        if ($request->has('delete_backgrounds')) {
+            $updatedBackgrounds = [];
+            foreach ($currentBackgrounds as $bg) {
+                if (in_array($bg, $request->delete_backgrounds)) {
+                    if (file_exists(public_path($bg))) {
+                        @unlink(public_path($bg));
+                    }
+                } else {
+                    $updatedBackgrounds[] = $bg;
+                }
+            }
+            $currentBackgrounds = $updatedBackgrounds;
+        }
+
+        // Upload new biography backgrounds
+        if ($request->hasFile('bio_backgrounds')) {
+            // Create folder if it doesn't exist
+            if (!file_exists(public_path('uploads/bio_backgrounds'))) {
+                @mkdir(public_path('uploads/bio_backgrounds'), 0777, true);
+            }
+
+            foreach ($request->file('bio_backgrounds') as $file) {
+                $fileName = 'bio_bg_' . uniqid() . '_' . time() . '.' . $file->getClientOriginalExtension();
+                $file->move(public_path('uploads/bio_backgrounds'), $fileName);
+                $currentBackgrounds[] = 'uploads/bio_backgrounds/' . $fileName;
+            }
+        }
+
+        $data['bio_backgrounds'] = $currentBackgrounds;
 
         // Upload Profile Photo (Biography Main Image)
         if ($request->hasFile('photo')) {
@@ -181,6 +223,6 @@ class DashboardController extends Controller
             $profile->update($data);
         }
 
-        return redirect()->route('admin.biography.edit')->with('success', 'La sección de biografía ha sido actualizada con éxito.');
+        return redirect()->back()->with('success', 'La información ha sido actualizada con éxito.');
     }
 }

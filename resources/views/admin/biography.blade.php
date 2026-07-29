@@ -6,211 +6,201 @@
 @section('content')
 
 <style>
-    .bio-preview-container {
-        position: relative;
-        width: 100%;
-        height: 140px;
-        border-radius: 8px;
-        overflow: hidden;
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        background-color: var(--bg-dark);
-        margin-top: 0.5rem;
+    .bio-editor-container {
+        max-width: 800px;
+        margin: 0 auto;
+        animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
     }
-    .bio-preview-container img {
+
+    @keyframes fadeInUp {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .bg-thumb-card {
+        position: relative;
+        aspect-ratio: 16 / 10;
+        border-radius: 12px;
+        overflow: hidden;
+        border: 1px solid var(--border-color);
+        background: rgba(255, 255, 255, 0.01);
+        transition: all 0.3s ease;
+    }
+
+    .bg-thumb-card:hover {
+        border-color: rgba(239, 68, 68, 0.5);
+        box-shadow: 0 4px 15px rgba(239, 68, 68, 0.15);
+    }
+
+    .bg-thumb-card img {
         width: 100%;
         height: 100%;
         object-fit: cover;
     }
-    .bio-image-circle {
-        position: relative;
-        width: 120px;
-        height: 120px;
-        border-radius: 50%;
-        overflow: hidden;
-        border: 3px solid rgba(255, 255, 255, 0.15);
-        background-color: var(--bg-dark);
-        margin: 0 auto 1rem auto;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25);
+
+    .bg-delete-btn {
+        position: absolute;
+        inset: 0;
+        background: rgba(239, 68, 68, 0.85);
+        border: none;
+        color: #ffffff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        cursor: pointer;
+        font-size: 1.25rem;
     }
-    .bio-image-circle img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
+
+    .bg-thumb-card:hover .bg-delete-btn {
+        opacity: 1;
+    }
+
+    .file-input-wrapper {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+
+    .custom-file-upload {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.85rem 1.25rem;
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid var(--border-color);
+        border-radius: 10px;
+        color: #ffffff;
+        font-size: 0.85rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        width: fit-content;
+    }
+
+    .custom-file-upload:hover {
+        background: rgba(255, 255, 255, 0.08);
+        border-color: var(--border-hover);
+    }
+
+    .file-name-display {
+        font-size: 0.85rem;
+        color: var(--text-secondary);
+        font-weight: 300;
     }
 </style>
 
-<form action="{{ route('admin.biography.update') }}" method="POST" enctype="multipart/form-data">
-    @csrf
+<div class="bio-editor-container">
+    <form action="{{ route('admin.biography.update') }}" method="POST" enctype="multipart/form-data">
+        @csrf
 
-    <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 2rem;">
-        
-        <!-- LEFT COLUMN: The 3 public site images -->
-        <div>
-            <!-- Image 1: Main Photo -->
-            <div class="admin-card glass" style="text-align: center;">
-                <div class="admin-card-title" style="justify-content: center;"><i class="fa-solid fa-camera"></i> 1. Foto de Perfil (Bio Principal)</div>
-                
-                <div class="bio-image-circle">
-                    <img src="{{ $profile->photo_path ? asset($profile->photo_path) : asset('images/bio_lifestyle.png') }}" id="preview-photo-path" alt="Foto Perfil">
-                </div>
+        <!-- Keep other bio columns safe as hidden inputs -->
+        <input type="hidden" name="bio_tag" value="{{ $profile->bio_tag }}">
+        <input type="hidden" name="workspace_title" value="{{ $profile->workspace_title }}">
+        <input type="hidden" name="workspace_desc" value="{{ $profile->workspace_desc }}">
+        <input type="hidden" name="tech_title" value="{{ $profile->tech_title }}">
+        <input type="hidden" name="tech_desc" value="{{ $profile->tech_desc }}">
 
-                <div class="form-group" style="margin-bottom: 0;">
-                    <label for="photo" class="btn-action-text" style="display: flex; align-items: center; justify-content: center; gap: 0.5rem; border-style: dashed; border-color: rgba(255, 255, 255, 0.2); width: 100%; cursor: pointer;">
-                        <i class="fa-solid fa-cloud-arrow-up"></i> Cambiar Foto Principal
-                    </label>
-                    <input type="file" name="photo" id="photo" style="display: none;" accept="image/*" onchange="previewImageCircle(this, 'preview-photo-path'); document.getElementById('photo-lbl').innerText = this.files[0] ? this.files[0].name : '';">
-                    <span id="photo-lbl" style="font-size: 0.75rem; color: var(--text-muted); display: block; margin-top: 0.25rem;"></span>
-                </div>
+        <div class="admin-card">
+            <div class="admin-card-title">
+                <i class="fa-solid fa-user-astronaut"></i>
+                Editar Texto de Biografía
             </div>
 
-            <!-- Image 2: Workspace Image -->
-            <div class="admin-card glass">
-                <div class="admin-card-title"><i class="fa-solid fa-laptop-code"></i> 2. Imagen Workspace (Panel Superior)</div>
-                
-                <div class="bio-preview-container">
-                    @if ($profile->workspace_image)
-                        <img src="{{ asset($profile->workspace_image) }}" id="preview-workspace-img" alt="Workspace">
-                    @else
-                        <div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; color: var(--text-muted); font-size: 1rem;">
-                            Usa la imagen por defecto
-                        </div>
-                    @endif
-                </div>
-
-                <div class="form-group" style="margin-top: 1rem; margin-bottom: 0;">
-                    <label for="workspace_image" class="btn-action-text" style="display: flex; align-items: center; justify-content: center; gap: 0.5rem; border-style: dashed; border-color: rgba(255, 255, 255, 0.2); width: 100%; cursor: pointer;">
-                        <i class="fa-solid fa-cloud-arrow-up"></i> Cambiar Workspace
-                    </label>
-                    <input type="file" name="workspace_image" id="workspace_image" style="display: none;" accept="image/*" onchange="previewImageRect(this, 'preview-workspace-img'); document.getElementById('workspace-lbl').innerText = this.files[0] ? this.files[0].name : '';">
-                    <span id="workspace-lbl" style="font-size: 0.75rem; color: var(--text-muted); display: block; margin-top: 0.25rem;"></span>
-                </div>
+            <div class="form-group">
+                <label for="bio_title" class="form-label">Texto Gigante de Fondo (Outline) *</label>
+                <input 
+                    type="text" 
+                    name="bio_title" 
+                    id="bio_title" 
+                    class="form-input" 
+                    value="{{ old('bio_title', $profile->bio_title ?? 'YO') }}" 
+                    placeholder="ej. YO" 
+                    required
+                >
+                <span style="font-size: 0.78rem; color: var(--text-muted); display: block; margin-top: 0.4rem;">La palabra gigante delineada en el fondo de esta sección (ej. YO, BIO, SOY, etc.)</span>
             </div>
 
-            <!-- Image 3: Tech Stack Image -->
-            <div class="admin-card glass">
-                <div class="admin-card-title"><i class="fa-solid fa-microchip"></i> 3. Imagen Tech Stack (Panel Inferior)</div>
-                
-                <div class="bio-preview-container">
-                    @if ($profile->tech_image)
-                        <img src="{{ asset($profile->tech_image) }}" id="preview-tech-img" alt="Tech">
-                    @else
-                        <div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; color: var(--text-muted); font-size: 1rem;">
-                            Usa la imagen por defecto
-                        </div>
-                    @endif
-                </div>
-
-                <div class="form-group" style="margin-top: 1rem; margin-bottom: 0;">
-                    <label for="tech_image" class="btn-action-text" style="display: flex; align-items: center; justify-content: center; gap: 0.5rem; border-style: dashed; border-color: rgba(255, 255, 255, 0.2); width: 100%; cursor: pointer;">
-                        <i class="fa-solid fa-cloud-arrow-up"></i> Cambiar Tech Image
-                    </label>
-                    <input type="file" name="tech_image" id="tech_image" style="display: none;" accept="image/*" onchange="previewImageRect(this, 'preview-tech-img'); document.getElementById('tech-lbl').innerText = this.files[0] ? this.files[0].name : '';">
-                    <span id="tech-lbl" style="font-size: 0.75rem; color: var(--text-muted); display: block; margin-top: 0.25rem;"></span>
-                </div>
+            <div class="form-group">
+                <label for="bio_description" class="form-label">Cuerpo de la Biografía *</label>
+                <textarea 
+                    name="bio_description" 
+                    id="bio_description" 
+                    class="form-input" 
+                    style="min-height: 180px; resize: vertical; line-height: 1.7;" 
+                    placeholder="Escribe aquí tu biografía detallada tal como aparece en el sitio web..."
+                    required
+                >{{ old('bio_description', $profile->bio_description) }}</textarea>
             </div>
         </div>
 
-        <!-- RIGHT COLUMN: Biography Texts & Panels -->
-        <div>
-            <!-- Main biography text fields -->
-            <div class="admin-card glass" style="margin-bottom: 1.5rem;">
-                <div class="admin-card-title"><i class="fa-solid fa-user-astronaut"></i> Biografía - Información Principal</div>
+        <div class="admin-card" style="margin-top: 1.5rem;">
+            <div class="admin-card-title">
+                <i class="fa-solid fa-images"></i>
+                Fondos de la Sección de Biografía
+            </div>
+
+            <!-- Upload new backgrounds -->
+            <div class="form-group">
+                <label class="form-label">Subir Nuevas Imágenes de Fondo (Multiselección)</label>
+                <div class="file-input-wrapper">
+                    <label class="custom-file-upload">
+                        <input 
+                            type="file" 
+                            name="bio_backgrounds[]" 
+                            id="bio_backgrounds" 
+                            accept="image/*" 
+                            multiple 
+                            style="display: none;"
+                            onchange="handleBackgroundsUpload(this)"
+                        >
+                        <i class="fa-solid fa-cloud-arrow-up"></i> Seleccionar Imágenes
+                    </label>
+                    <span class="file-name-display" id="bg-file-count">Sin archivos seleccionados</span>
+                </div>
+                <span style="font-size: 0.78rem; color: var(--text-muted); display: block; margin-top: 0.5rem; line-height: 1.5;">
+                    Formatos admitidos: PNG, JPG, WebP. Puedes seleccionar y subir múltiples fondos que rotarán automáticamente.
+                </span>
+            </div>
+
+            <!-- Existing backgrounds list -->
+            <div style="margin-top: 2rem; border-top: 1px solid var(--border-color); padding-top: 1.5rem;">
+                <label class="form-label" style="margin-bottom: 0.85rem; display: block;">Imágenes de Fondo Actuales</label>
                 
-                <div class="form-group">
-                    <label for="bio_tag" class="form-label">Etiqueta Superior (Tag)</label>
-                    <input type="text" name="bio_tag" id="bio_tag" class="form-input" value="{{ old('bio_tag', $profile->bio_tag ?? 'El Humano Detrás del Código') }}" placeholder="Ej. El Humano Detrás del Código">
-                    <small style="color: var(--text-muted); font-size: 0.8rem;">Texto pequeño arriba del título principal</small>
-                </div>
-
-                <div class="form-group">
-                    <label for="bio_title" class="form-label">Título Principal</label>
-                    <input type="text" name="bio_title" id="bio_title" class="form-input" value="{{ old('bio_title', $profile->bio_title ?? 'Transformo Ideas en Realidad Digital') }}" placeholder="Ej. Transformo Ideas en Realidad Digital">
-                </div>
-
-                <div class="form-group" style="margin-bottom: 0;">
-                    <label for="bio_description" class="form-label">Descripción Detallada (Cuerpo principal)</label>
-                    <textarea name="bio_description" id="bio_description" class="form-input" style="min-height: 120px;">{{ old('bio_description', $profile->bio_description) }}</textarea>
-                </div>
+                @if (empty($profile->bio_backgrounds) || count($profile->bio_backgrounds) == 0)
+                    <p style="font-size: 0.88rem; color: var(--text-muted); margin: 0; padding: 1.25rem; background: rgba(255,255,255,0.01); border: 1px solid var(--border-color); border-radius: 12px; text-align: center;">
+                        No hay fondos cargados aún. Se usará la foto del hero por defecto.
+                    </p>
+                @else
+                    <div id="bio-bg-gallery" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 1rem;">
+                        @foreach ($profile->bio_backgrounds as $index => $bg)
+                            <div class="bg-thumb-card" id="bg-thumb-{{ $index }}">
+                                <img src="{{ asset($bg) }}" alt="Biography Background">
+                                <button type="button" class="bg-delete-btn" onclick="markBackgroundForDeletion('{{ $bg }}', {{ $index }})" title="Eliminar este fondo">
+                                    <i class="fa-solid fa-trash-can"></i>
+                                </button>
+                            </div>
+                        @endforeach
+                    </div>
+                @endif
             </div>
 
-            <!-- Workspace & Tech stack texts -->
-            <div style="display: grid; grid-template-columns: 1fr; gap: 1.5rem;">
-                <!-- Workspace Text fields -->
-                <div class="admin-card glass" style="margin-bottom: 0;">
-                    <div class="admin-card-title"><i class="fa-solid fa-laptop-code" style="color: var(--accent-cyan);"></i> Contenido de Workspace</div>
-                    
-                    <div class="form-group">
-                        <label for="workspace_title" class="form-label">Título del Panel</label>
-                        <input type="text" name="workspace_title" id="workspace_title" class="form-input" value="{{ old('workspace_title', $profile->workspace_title ?? 'Mi Laboratorio') }}">
-                    </div>
+            <!-- Hidden input container for deleted backgrounds -->
+            <div id="deleted-backgrounds-container"></div>
 
-                    <div class="form-group" style="margin-bottom: 0;">
-                        <label for="workspace_desc" class="form-label">Descripción del Panel</label>
-                        <textarea name="workspace_desc" id="workspace_desc" class="form-input" style="min-height: 80px;">{{ old('workspace_desc', $profile->workspace_desc) }}</textarea>
-                    </div>
-                </div>
-
-                <!-- Tech Stack Text fields -->
-                <div class="admin-card glass" style="margin-bottom: 0;">
-                    <div class="admin-card-title"><i class="fa-solid fa-microchip" style="color: var(--accent-cyan);"></i> Contenido de Tech Stack</div>
-                    
-                    <div class="form-group">
-                        <label for="tech_title" class="form-label">Título del Panel</label>
-                        <input type="text" name="tech_title" id="tech_title" class="form-input" value="{{ old('tech_title', $profile->tech_title ?? 'Stack Tecnológico') }}">
-                    </div>
-
-                    <div class="form-group" style="margin-bottom: 0;">
-                        <label for="tech_desc" class="form-label">Descripción del Panel</label>
-                        <textarea name="tech_desc" id="tech_desc" class="form-input" style="min-height: 80px;">{{ old('tech_desc', $profile->tech_desc) }}</textarea>
-                    </div>
-                </div>
-            </div>
-
-            <div style="margin-top: 2rem; border-top: 1px solid var(--border-color); padding-top: 1.5rem; text-align: right;">
-                <a href="{{ route('admin.dashboard') }}" class="btn-action-text" style="display: inline-flex; align-items: center; justify-content: center; margin-right: 1rem; border: 1px solid rgba(255,255,255,0.1);">
-                    Volver al Dashboard
+            <div style="margin-top: 2.5rem; padding-top: 1.8rem; border-top: 1px solid var(--border-color); text-align: right; display: flex; justify-content: flex-end; gap: 1rem;">
+                <a href="{{ route('admin.dashboard') }}" class="btn-action" style="padding: 0.85rem 1.5rem; border-radius: 12px;">
+                    Cancelar
                 </a>
                 <button type="submit" class="btn-primary">
-                    <i class="fa-solid fa-floppy-disk" style="margin-right: 0.5rem;"></i> Guardar Biografía
+                    <i class="fa-solid fa-floppy-disk"></i>
+                    Guardar Cambios
                 </button>
             </div>
         </div>
-        
-    </div>
-</form>
-
-<script>
-    // Image preview circle uploader
-    function previewImageCircle(input, previewId) {
-        if (input.files && input.files[0]) {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const previewImg = document.getElementById(previewId);
-                if (previewImg) {
-                    previewImg.src = e.target.result;
-                }
-            };
-            reader.readAsDataURL(input.files[0]);
-        }
-    }
-
-    // Image preview rectangle uploader
-    function previewImageRect(input, previewId) {
-        if (input.files && input.files[0]) {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                let previewImg = document.getElementById(previewId);
-                if (previewImg) {
-                    previewImg.src = e.target.result;
-                } else {
-                    // If fallback div is present, replace it or create img
-                    const parent = document.querySelector('[id="' + previewId + '"]').parentNode;
-                    parent.innerHTML = '<img src="' + e.target.result + '" id="' + previewId + '" alt="Vista previa">';
-                }
-            };
-            reader.readAsDataURL(input.files[0]);
-        }
-    }
-</script>
+    </form>
+</div>
 
 @endsection

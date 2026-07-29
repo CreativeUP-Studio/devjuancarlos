@@ -24,11 +24,25 @@ class Profile extends Model
         'workspace_desc',
         'tech_title',
         'tech_desc',
+        'hero_status_text',
+        'hero_float_icon',
+        'hero_float_label',
+        'hero_float_value',
         'github_url',
         'linkedin_url',
         'email',
         'phone',
         'location',
         'cv_path',
+        'bio_backgrounds',
+    ];
+
+    /**
+     * The attributes that should be cast.
+     *
+     * @var array<string, string>
+     */
+    protected $casts = [
+        'bio_backgrounds' => 'array',
     ];
 }

@@ -30,20 +30,36 @@ class TravelController extends Controller
      */
     public function store(Request $request)
     {
-        $request->validate([
+        $rules = [
             'title' => ['required', 'string', 'max:255'],
+            'location' => ['nullable', 'string', 'max:255'],
+            'country' => ['nullable', 'string', 'max:255'],
+            'year' => ['nullable', 'string', 'max:255'],
+            'travel_date' => ['nullable', 'string', 'max:255'],
             'description' => ['required', 'string'],
+            'content' => ['nullable', 'string'],
+            'media_type' => ['required', 'string', 'in:image,video'],
             'badge' => ['nullable', 'string', 'max:255'],
             'meta_1_icon' => ['nullable', 'string', 'max:255'],
             'meta_1_text' => ['nullable', 'string', 'max:255'],
             'meta_2_icon' => ['nullable', 'string', 'max:255'],
             'meta_2_text' => ['nullable', 'string', 'max:255'],
-            'image' => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif,webp', 'max:4096'],
+            'image' => ['required', 'image', 'mimes:jpeg,png,jpg,gif,webp', 'max:15360'],
+            'audio' => ['nullable', 'mimes:mp3,wav,ogg,m4a', 'max:20480'],
+            'video' => [$request->media_type === 'video' ? 'required' : 'nullable', 'mimes:mp4,webm,ogg,mov', 'max:153600'],
             'order' => ['required', 'integer'],
+        ];
+
+        $request->validate($rules, [
+            'image.required' => 'La imagen de fondo 100vh es obligatoria para guardar el viaje.',
+            'video.required' => 'Debes seleccionar y subir un archivo de video cuando el tipo de contenido es Video.',
+            'video.max' => 'El archivo de video no debe superar los 150 MB.',
+            'image.max' => 'La imagen no debe superar los 15 MB.',
         ]);
 
         $data = $request->only([
-            'title', 'description', 'badge', 
+            'title', 'location', 'country', 'year', 'travel_date', 'description', 'content', 
+            'media_type', 'badge', 
             'meta_1_icon', 'meta_1_text', 
             'meta_2_icon', 'meta_2_text', 
             'order'
@@ -57,11 +73,28 @@ class TravelController extends Controller
             $data['meta_2_icon'] = 'fa-solid fa-camera';
         }
 
+        // Handle Background Image Upload
         if ($request->hasFile('image')) {
             $image = $request->file('image');
             $imageName = 'travel_' . time() . '.' . $image->getClientOriginalExtension();
             $image->move(public_path('uploads/travels'), $imageName);
             $data['image_path'] = 'uploads/travels/' . $imageName;
+        }
+
+        // Handle Audio Upload
+        if ($request->hasFile('audio')) {
+            $audio = $request->file('audio');
+            $audioName = 'audio_' . time() . '.' . $audio->getClientOriginalExtension();
+            $audio->move(public_path('uploads/audio'), $audioName);
+            $data['audio_path'] = 'uploads/audio/' . $audioName;
+        }
+
+        // Handle Video Upload
+        if ($request->hasFile('video')) {
+            $video = $request->file('video');
+            $videoName = 'video_' . time() . '.' . $video->getClientOriginalExtension();
+            $video->move(public_path('uploads/videos'), $videoName);
+            $data['video_path'] = 'uploads/videos/' . $videoName;
         }
 
         Travel::create($data);
@@ -82,20 +115,37 @@ class TravelController extends Controller
      */
     public function update(Request $request, Travel $travel)
     {
-        $request->validate([
+        $needVideo = ($request->media_type === 'video' && !$travel->video_path);
+
+        $rules = [
             'title' => ['required', 'string', 'max:255'],
+            'location' => ['nullable', 'string', 'max:255'],
+            'country' => ['nullable', 'string', 'max:255'],
+            'year' => ['nullable', 'string', 'max:255'],
+            'travel_date' => ['nullable', 'string', 'max:255'],
             'description' => ['required', 'string'],
+            'content' => ['nullable', 'string'],
+            'media_type' => ['required', 'string', 'in:image,video'],
             'badge' => ['nullable', 'string', 'max:255'],
             'meta_1_icon' => ['nullable', 'string', 'max:255'],
             'meta_1_text' => ['nullable', 'string', 'max:255'],
             'meta_2_icon' => ['nullable', 'string', 'max:255'],
             'meta_2_text' => ['nullable', 'string', 'max:255'],
-            'image' => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif,webp', 'max:4096'],
+            'image' => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif,webp', 'max:15360'],
+            'audio' => ['nullable', 'mimes:mp3,wav,ogg,m4a', 'max:20480'],
+            'video' => [$needVideo ? 'required' : 'nullable', 'mimes:mp4,webm,ogg,mov', 'max:153600'],
             'order' => ['required', 'integer'],
+        ];
+
+        $request->validate($rules, [
+            'video.required' => 'Debes subir un archivo de video cuando seleccionas la opción Video.',
+            'video.max' => 'El archivo de video no debe superar los 150 MB.',
+            'image.max' => 'La imagen no debe superar los 15 MB.',
         ]);
 
         $data = $request->only([
-            'title', 'description', 'badge', 
+            'title', 'location', 'country', 'year', 'travel_date', 'description', 'content', 
+            'media_type', 'badge', 
             'meta_1_icon', 'meta_1_text', 
             'meta_2_icon', 'meta_2_text', 
             'order'
@@ -109,16 +159,62 @@ class TravelController extends Controller
             $data['meta_2_icon'] = 'fa-solid fa-camera';
         }
 
-        if ($request->hasFile('image')) {
-            // Delete old image if exists
+        // Handle File Deletions requested by user
+        if ($request->boolean('delete_image')) {
             if ($travel->image_path && file_exists(public_path($travel->image_path))) {
                 @unlink(public_path($travel->image_path));
             }
+            $data['image_path'] = null;
+        }
 
+        if ($request->boolean('delete_video')) {
+            if ($travel->video_path && file_exists(public_path($travel->video_path))) {
+                @unlink(public_path($travel->video_path));
+            }
+            $data['video_path'] = null;
+            if (isset($data['media_type']) && $data['media_type'] === 'video') {
+                $data['media_type'] = 'image';
+            }
+        }
+
+        if ($request->boolean('delete_audio')) {
+            if ($travel->audio_path && file_exists(public_path($travel->audio_path))) {
+                @unlink(public_path($travel->audio_path));
+            }
+            $data['audio_path'] = null;
+        }
+
+        // Handle Background Image Upload
+        if ($request->hasFile('image')) {
+            if ($travel->image_path && file_exists(public_path($travel->image_path))) {
+                @unlink(public_path($travel->image_path));
+            }
             $image = $request->file('image');
             $imageName = 'travel_' . time() . '.' . $image->getClientOriginalExtension();
             $image->move(public_path('uploads/travels'), $imageName);
             $data['image_path'] = 'uploads/travels/' . $imageName;
+        }
+
+        // Handle Audio Upload
+        if ($request->hasFile('audio')) {
+            if ($travel->audio_path && file_exists(public_path($travel->audio_path))) {
+                @unlink(public_path($travel->audio_path));
+            }
+            $audio = $request->file('audio');
+            $audioName = 'audio_' . time() . '.' . $audio->getClientOriginalExtension();
+            $audio->move(public_path('uploads/audio'), $audioName);
+            $data['audio_path'] = 'uploads/audio/' . $audioName;
+        }
+
+        // Handle Video Upload
+        if ($request->hasFile('video')) {
+            if ($travel->video_path && file_exists(public_path($travel->video_path))) {
+                @unlink(public_path($travel->video_path));
+            }
+            $video = $request->file('video');
+            $videoName = 'video_' . time() . '.' . $video->getClientOriginalExtension();
+            $video->move(public_path('uploads/videos'), $videoName);
+            $data['video_path'] = 'uploads/videos/' . $videoName;
         }
 
         $travel->update($data);

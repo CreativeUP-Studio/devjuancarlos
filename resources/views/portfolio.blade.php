@@ -12,7 +12,9 @@
     <!-- Google Fonts & Icons -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Alex+Brush&family=Great+Vibes&family=MonteCarlo&family=Pinyon+Script&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/devicons/devicon@v2.15.1/devicon.min.css">
     
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
@@ -20,8 +22,8 @@
     @php
         $photoUrl = $profile && $profile->photo_path ? asset($profile->photo_path) : asset('images/bio_lifestyle.png');
         $heroBgUrl = $profile && $profile->hero_bg_image ? asset($profile->hero_bg_image) : asset('images/nav_inicio.png');
+        $techBgUrl = $profile && $profile->tech_image ? asset($profile->tech_image) : asset('images/nav_habilidades.png');
     @endphp
-    @include('partials.preloader')
 
     <!-- Header / Navigation Bar -->
     <nav class="navbar" id="navbar">
@@ -38,10 +40,8 @@
                                 <stop offset="100%" stop-color="#fcaf45" />
                             </linearGradient>
                         </defs>
-                        <!-- Path D -->
-                        <path class="logo-path-d" d="M 22,26 L 47,26 A 20,20 0 0 1 67,46 A 20,20 0 0 1 47,66 L 22,66" stroke="#ffffff" stroke-width="8.5" stroke-linecap="round" stroke-linejoin="round" fill="none" />
-                        <!-- Path J -->
-                        <path class="logo-path-j" d="M 77,43 L 77,56 A 20,20 0 0 1 57,76 L 42,76" stroke="#ffffff" stroke-width="8.5" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+                        <!-- Calligraphic JC Monogram -->
+                        <text x="50%" y="72%" text-anchor="middle" class="logo-script-text">JC</text>
                     </svg>
                 </div>
             </div>
@@ -51,13 +51,10 @@
         <div class="navbar-links">
             <a href="#hero">Inicio</a>
             <a href="#biografia">Biografía</a>
-            <a href="#proyectos">Proyectos</a>
             <a href="#habilidades">Habilidades</a>
+            <a href="#proyectos">Proyectos</a>
             <a href="#viajes">Viajes</a>
             <a href="#contacto" class="btn-contact">Contáctame</a>
-            @auth
-                <a href="{{ route('admin.dashboard') }}" style="color: var(--text-primary); font-weight: 600;"><i class="fa-solid fa-user-gear"></i> Panel Admin</a>
-            @endauth
         </div>
 
         <!-- Mobile Menu Toggle Button (Grid Icon) -->
@@ -73,489 +70,488 @@
 
     <!-- Mobile Menu Overlay -->
     <div class="mobile-menu-overlay" id="mobileMenuOverlay">
+        <!-- Background image same as header, but darker -->
+        <div class="menu-bg-image" style="background-image: url('{{ $heroBgUrl }}');"></div>
+        <div class="menu-bg-overlay"></div>
+
         <div class="mobile-menu-content">
-            <!-- Close Button -->
-            <button class="mobile-menu-close" id="mobileMenuClose" aria-label="Cerrar menú">
-                <i class="fa-solid fa-xmark"></i>
-            </button>
-
-            <div class="mobile-menu-grid">
-                <!-- Sidebar (Left Panel) -->
-                <div class="mobile-menu-sidebar">
-                    <div class="sidebar-top">
-                        <div class="logo-container">
-                            <div class="logo-svg-container" style="width: 56px; height: 56px;">
-                                <svg class="logo-svg" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <defs>
-                                        <linearGradient id="insta-grad" x1="0%" y1="0%" x2="100%" y2="100%">
-                                            <stop offset="0%" stop-color="#405de6" />
-                                            <stop offset="25%" stop-color="#833ab4" />
-                                            <stop offset="50%" stop-color="#e1306c" />
-                                            <stop offset="75%" stop-color="#f56040" />
-                                            <stop offset="100%" stop-color="#fcaf45" />
-                                        </linearGradient>
-                                    </defs>
-                                    <!-- Path D -->
-                                    <path class="logo-path-d" d="M 22,26 L 47,26 A 20,20 0 0 1 67,46 A 20,20 0 0 1 47,66 L 22,66" stroke="#ffffff" stroke-width="8.5" stroke-linecap="round" stroke-linejoin="round" fill="none" />
-                                    <!-- Path J -->
-                                    <path class="logo-path-j" d="M 77,43 L 77,56 A 20,20 0 0 1 57,76 L 42,76" stroke="#ffffff" stroke-width="8.5" stroke-linecap="round" stroke-linejoin="round" fill="none" />
-                                </svg>
-                            </div>
-                        </div>
-                        <h3 class="sidebar-name">{{ $profile->name ?? 'Juan Carlos Chahuayo Martínez' }}</h3>
-                        <p class="sidebar-title">{{ $profile->title ?? 'Desarrollador Web & Especialista en IA' }}</p>
-                    </div>
-
-                    <div class="sidebar-middle">
-                        <div class="sidebar-preview-wrapper">
-                            <div class="sidebar-preview-image active" id="preview-default" style="background-image: url('{{ asset('images/nav_default.png') }}')"></div>
-                            <div class="sidebar-preview-image" id="preview-inicio" style="background-image: url('{{ asset('images/nav_inicio.png') }}')"></div>
-                            <div class="sidebar-preview-image" id="preview-biografia" style="background-image: url('{{ $photoUrl }}')"></div>
-                            <div class="sidebar-preview-image" id="preview-proyectos" style="background-image: url('{{ asset('images/nav_proyectos.png') }}')"></div>
-                            <div class="sidebar-preview-image" id="preview-habilidades" style="background-image: url('{{ asset('images/nav_habilidades.png') }}')"></div>
-                            <div class="sidebar-preview-image" id="preview-viajes" style="background-image: url('{{ asset('images/nav_viajes.png') }}')"></div>
-                            <div class="sidebar-preview-image" id="preview-contacto" style="background-image: url('{{ asset('images/nav_contacto.png') }}')"></div>
-                        </div>
-                    </div>
-
-                    <div class="sidebar-bottom">
-                        <div class="sidebar-contact-info">
-                            @if($profile && $profile->email)
-                                <a href="mailto:{{ $profile->email }}" class="sidebar-email">
-                                    <i class="fa-solid fa-envelope"></i> {{ $profile->email }}
-                                </a>
-                            @endif
-                        </div>
-                        <div class="mobile-social-links">
-                            @if($profile && $profile->github_url)
-                                <a href="{{ $profile->github_url }}" target="_blank" class="mobile-social-icon" title="GitHub">
-                                    <i class="fa-brands fa-github"></i>
-                                </a>
-                            @endif
-                            @if($profile && $profile->linkedin_url)
-                                <a href="{{ $profile->linkedin_url }}" target="_blank" class="mobile-social-icon" title="LinkedIn">
-                                    <i class="fa-brands fa-linkedin-in"></i>
-                                </a>
-                            @endif
-                        </div>
+            <!-- Modal Header: Logo Top-Left & Close Button Top-Right (No line) -->
+            <div class="mobile-menu-header">
+                <div class="logo-container">
+                    <div class="logo-svg-container" style="width: 50px; height: 50px;">
+                        <svg class="logo-svg" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <defs>
+                                <linearGradient id="insta-grad-menu" x1="0%" y1="0%" x2="100%" y2="100%">
+                                    <stop offset="0%" stop-color="#405de6" />
+                                    <stop offset="25%" stop-color="#833ab4" />
+                                    <stop offset="50%" stop-color="#e1306c" />
+                                    <stop offset="75%" stop-color="#f56040" />
+                                    <stop offset="100%" stop-color="#fcaf45" />
+                                </linearGradient>
+                            </defs>
+                            <!-- Calligraphic JC Monogram -->
+                            <text x="50%" y="72%" text-anchor="middle" class="logo-script-text">JC</text>
+                        </svg>
                     </div>
                 </div>
 
-                <!-- Navigation List (Right Panel) -->
-                <div class="mobile-menu-main">
-                    <span class="menu-label-tag">Menú de Navegación</span>
-                    <nav class="mobile-menu-nav">
-                        <a href="#hero" class="mobile-menu-link" data-preview="preview-inicio">
-                            <span class="mobile-menu-link-num">01</span>
-                            <span class="mobile-menu-link-content">
-                                <span class="mobile-menu-link-main">Inicio</span>
-                                <span class="mobile-menu-link-sub">Página principal y biografía</span>
-                            </span>
-                            <i class="fa-solid fa-arrow-right link-arrow"></i>
-                        </a>
+                <!-- Close Button Top Right -->
+                <button class="mobile-menu-close" id="mobileMenuClose" aria-label="Cerrar menú">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
 
-                        <a href="#biografia" class="mobile-menu-link" data-preview="preview-biografia">
-                            <span class="mobile-menu-link-num">02</span>
-                            <span class="mobile-menu-link-content">
-                                <span class="mobile-menu-link-main">Biografía</span>
-                                <span class="mobile-menu-link-sub">Quién soy y mi trayectoria</span>
-                            </span>
-                            <i class="fa-solid fa-arrow-right link-arrow"></i>
-                        </a>
-                        
-                        <a href="#proyectos" class="mobile-menu-link" data-preview="preview-proyectos">
-                            <span class="mobile-menu-link-num">03</span>
-                            <span class="mobile-menu-link-content">
-                                <span class="mobile-menu-link-main">Proyectos</span>
-                                <span class="mobile-menu-link-sub">Mis últimos desarrollos y sistemas</span>
-                            </span>
-                            <i class="fa-solid fa-arrow-right link-arrow"></i>
-                        </a>
-                        
-                        <a href="#habilidades" class="mobile-menu-link" data-preview="preview-habilidades">
-                            <span class="mobile-menu-link-num">04</span>
-                            <span class="mobile-menu-link-content">
-                                <span class="mobile-menu-link-main">Habilidades</span>
-                                <span class="mobile-menu-link-sub">Conocimientos técnicos y especialidades</span>
-                            </span>
-                            <i class="fa-solid fa-arrow-right link-arrow"></i>
-                        </a>
+            <!-- Body: Navigation Links -->
+            <div class="mobile-menu-body">
+                <nav class="mobile-menu-nav">
+                    <a href="#hero" class="mobile-menu-link">
+                        <span class="mobile-menu-link-num">1</span>
+                        <span class="mobile-menu-link-main">Inicio</span>
+                    </a>
 
-                        <a href="#viajes" class="mobile-menu-link" data-preview="preview-viajes">
-                            <span class="mobile-menu-link-num">05</span>
-                            <span class="mobile-menu-link-content">
-                                <span class="mobile-menu-link-main">Viajes</span>
-                                <span class="mobile-menu-link-sub">Mis destinos y bitácora de aventuras</span>
-                            </span>
-                            <i class="fa-solid fa-arrow-right link-arrow"></i>
-                        </a>
-                        
-                        <a href="#contacto" class="mobile-menu-link" data-preview="preview-contacto">
-                            <span class="mobile-menu-link-num">06</span>
-                            <span class="mobile-menu-link-content">
-                                <span class="mobile-menu-link-main">Contáctame</span>
-                                <span class="mobile-menu-link-sub">Envíame un mensaje directo</span>
-                            </span>
-                            <i class="fa-solid fa-arrow-right link-arrow"></i>
-                        </a>
-                        
-                        @auth
-                            <a href="{{ route('admin.dashboard') }}" class="mobile-menu-link" data-preview="preview-default">
-                                <span class="mobile-menu-link-num">07</span>
-                                <span class="mobile-menu-link-content">
-                                    <span class="mobile-menu-link-main">Panel Admin</span>
-                                    <span class="mobile-menu-link-sub">Gestión interna del portafolio</span>
-                                </span>
-                                <i class="fa-solid fa-arrow-right link-arrow"></i>
-                            </a>
-                        @endauth
-                    </nav>
-                </div>
+                    <a href="#biografia" class="mobile-menu-link">
+                        <span class="mobile-menu-link-num">2</span>
+                        <span class="mobile-menu-link-main">Biografía</span>
+                    </a>
+
+                    <a href="#habilidades" class="mobile-menu-link">
+                        <span class="mobile-menu-link-num">3</span>
+                        <span class="mobile-menu-link-main">Habilidades</span>
+                    </a>
+                    
+                    <a href="#proyectos" class="mobile-menu-link">
+                        <span class="mobile-menu-link-num">4</span>
+                        <span class="mobile-menu-link-main">Proyectos</span>
+                    </a>
+
+                    <a href="#viajes" class="mobile-menu-link">
+                        <span class="mobile-menu-link-num">5</span>
+                        <span class="mobile-menu-link-main">Viajes</span>
+                    </a>
+                    
+                    <a href="#contacto" class="mobile-menu-link">
+                        <span class="mobile-menu-link-num">6</span>
+                        <span class="mobile-menu-link-main">Contáctame</span>
+                    </a>
+                </nav>
             </div>
         </div>
     </div>
 
-    <!-- Hero Section with Fullscreen Background Image -->
-    <section id="hero" class="hero" style="background-image: url('{{ $heroBgUrl }}');">
-        <div class="hero-overlay"></div>
-        
-        <!-- Bottom-anchored cinematic content -->
-        <div class="hero-bottom">
-            <div class="hero-content-new">
-                <span class="hero-label">Portafolio Personal</span>
-                @php
-                    $fullName = $profile->name ?? 'Juan Carlos Chahuayo Martínez';
-                    $nameParts = explode(' ', $fullName, 2);
-                    $firstName = $nameParts[0] ?? '';
-                    $lastName = $nameParts[1] ?? '';
-                @endphp
-                <h1 class="hero-title-new">
-                    <span class="hero-firstname">{{ $firstName }}</span>
-                    <span class="hero-lastname hero-text-gradient">{{ $lastName }}</span>
+    <!-- Hero Section — Clean Left Overlay & Full Crisp Background -->
+    <section id="hero" class="hero-split">
+        <!-- Natural background image -->
+        <div class="hero-bg-image-blur" style="background-image: url('{{ $heroBgUrl }}');"></div>
+        <div class="hero-bg-overlay"></div>
+
+        <!-- Left side details -->
+        <div class="hero-left">
+            <div class="hero-left-content">
+                <!-- Name -->
+                <h1 class="hero-name">
+                    <span class="hero-name-main">{{ $profile->name ?? 'Juan Carlos Chahuayo Martínez' }}</span>
                 </h1>
-                <p class="hero-presentation-new">
-                    {{ $profile->title ?? 'Desarrollador Web & Especialista en IA' }}
-                </p>
-                <div class="hero-cta-new">
-                    <a href="#contacto" class="btn-hero-collaboration">
-                        <span>Iniciar Colaboración</span>
-                        <i class="fa-solid fa-arrow-right"></i>
-                    </a>
+
+                <!-- Subtitle (No Line) -->
+                <div class="hero-subtitle">
+                    <span>{{ $profile->title ?? 'Estudiante de ingeniería de sistemas' }}</span>
+                </div>
+
+                <!-- Action Button -->
+                <div class="hero-action">
+                    <a href="#contacto" class="btn-hablemos">Hablemos</a>
                 </div>
             </div>
-            <!-- Scroll indicator -->
-            <div class="hero-scroll-hint">
-                <span>Scroll</span>
-                <div class="scroll-line"></div>
+        </div>
+
+        <!-- Bottom scroll indicator -->
+        <div class="hero-scroll-indicator">
+            <div class="scroll-mouse">
+                <div class="scroll-wheel"></div>
             </div>
+            <span class="scroll-text">Scroll para explorar</span>
         </div>
     </section>
 
-    <!-- Biography Section with Fullscreen Image Layout -->
-    <section id="biografia" class="biografia-section-fullscreen">
-        <!-- Large Image with Bio Content -->
-        <div class="bio-image-large">
-            <img src="{{ $photoUrl }}" alt="Perfil Principal" class="bio-img">
-            <div class="bio-image-overlay"></div>
-            
-            <!-- Bio Content Inside Image -->
-            <div class="bio-content-overlay">
-                <div class="bio-inner-content">
-                    <span class="bio-tag">{{ $profile->bio_tag ?? 'El Humano Detrás del Código' }}</span>
-                    <h2 class="bio-main-title">
-                        {!! nl2br(e($profile->bio_title ?? 'Transformo Ideas en Realidad Digital')) !!}
-                    </h2>
-                    <p class="bio-elegant-text">
-                        {{ $profile->bio_description ?? $profile->bio ?? 'Arquitecto de experiencias digitales, fusiono la elegancia del diseño con la potencia de la inteligencia artificial. Cada línea de código cuenta una historia, cada sistema resuelve un problema real.' }}
-                    </p>
-                    
-                    <div class="bio-identity-grid">
-                        <div class="bio-identity-item">
-                            <i class="fa-solid fa-signature"></i>
-                            <div>
-                                <span class="bio-identity-label">Identidad</span>
-                                <span class="bio-identity-value">{{ $profile->name ?? 'Juan Carlos Chahuayo' }}</span>
-                            </div>
-                        </div>
-                        <div class="bio-identity-item">
-                            <i class="fa-solid fa-code-branch"></i>
-                            <div>
-                                <span class="bio-identity-label">Especialización</span>
-                                <span class="bio-identity-value">{{ $profile->title ?? 'Desarrollo Web & IA' }}</span>
-                            </div>
-                        </div>
-                        @if($profile && $profile->email)
-                        <div class="bio-identity-item">
-                            <i class="fa-solid fa-at"></i>
-                            <div>
-                                <span class="bio-identity-label">Conexión</span>
-                                <span class="bio-identity-value">{{ $profile->email }}</span>
-                            </div>
-                        </div>
-                        @endif
-                    </div>
-
-                    @if($profile && $profile->cv_path)
-                    <div class="bio-cta-wrapper">
-                        <a href="{{ asset($profile->cv_path) }}" target="_blank" class="btn-bio-cv">
-                            <span>Explorar Trayectoria</span>
-                            <i class="fa-solid fa-arrow-right"></i>
-                        </a>
-                    </div>
-                    @endif
-                </div>
-            </div>
-        </div>
-
-        <!-- Small Images with Labels -->
-        <div class="bio-images-small-column">
-            <!-- Top Small Image - Workspace -->
-            <div class="bio-image-small">
-                <img src="{{ $profile && $profile->workspace_image ? asset($profile->workspace_image) : asset('images/bio_workspace.png') }}" alt="Espacio de Trabajo" class="bio-img">
-                <div class="bio-image-overlay-strong"></div>
-                <div class="bio-small-content">
-                    <div class="bio-small-icon">
-                        <i class="fa-solid fa-laptop-code"></i>
-                    </div>
-                    <h3 class="bio-small-title">{{ $profile->workspace_title ?? 'Mi Laboratorio' }}</h3>
-                    <p class="bio-small-desc">{{ $profile->workspace_desc ?? 'Donde las ideas cobran vida y el café se transforma en código' }}</p>
-                </div>
-            </div>
-            
-            <!-- Bottom Small Image - Tech Stack -->
-            <div class="bio-image-small">
-                <img src="{{ $profile && $profile->tech_image ? asset($profile->tech_image) : asset('images/bio_tech.png') }}" alt="Tecnología" class="bio-img">
-                <div class="bio-image-overlay-strong"></div>
-                <div class="bio-small-content">
-                    <div class="bio-small-icon">
-                        <i class="fa-solid fa-microchip"></i>
-                    </div>
-                    <h3 class="bio-small-title">{{ $profile->tech_title ?? 'Stack Tecnológico' }}</h3>
-                    <p class="bio-small-desc">{{ $profile->tech_desc ?? 'Herramientas de vanguardia para construir el futuro' }}</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Projects Grid Section — Fullscreen Split Layout -->
-    <section id="proyectos" style="min-height: 100vh; height: 100vh; position: relative; overflow: hidden; padding: 0; margin: 0;">
-        <!-- Header Overlay -->
-        <div class="projects-header-overlay">
-            <span class="section-subtitle">Portafolio</span>
-            <h2 class="section-title">Proyectos <span class="text-gradient">Destacados</span></h2>
-        </div>
-
-        @if($projects->isEmpty())
-            <div style="height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; color: var(--text-muted); background: var(--bg-dark);">
-                <i class="fa-solid fa-diagram-project" style="font-size: 3rem; margin-bottom: 1.5rem; color: var(--accent-cyan);"></i>
-                <p style="font-size: 1.25rem;">Pronto se añadirán nuevos proyectos interesantes. ¡Vuelve pronto!</p>
-            </div>
+    <!-- Biography Section — Fullscreen Editorial Layout -->
+    <section id="biografia" class="bio-section-fullscreen">
+        <!-- Multiple background layers for slideshow -->
+        @if(!empty($profile->bio_backgrounds) && count($profile->bio_backgrounds) > 0)
+            @foreach($profile->bio_backgrounds as $index => $bg)
+                <div class="bio-slide-bg {{ $index === 0 ? 'active' : '' }}" style="background-image: url('{{ asset($bg) }}');"></div>
+            @endforeach
         @else
-            @php
-                $featuredProjects = $projects->take(2);
-            @endphp
-            <div class="projects-split-container">
-                @foreach($featuredProjects as $project)
-                    <article class="project-panel">
-                        <div class="project-panel-bg" style="background-image: url('{{ $project->image_path ? asset($project->image_path) : asset('images/nav_proyectos.png') }}')"></div>
-                        <div class="project-panel-overlay"></div>
-                        
-                        <div class="project-panel-content">
-                            <div class="project-panel-tags">
-                                @foreach($project->tech_stack_array as $tech)
-                                    <span class="project-panel-tag">{{ $tech }}</span>
-                                @endforeach
-                            </div>
-                            <h3 class="project-panel-title">{{ $project->title }}</h3>
-                            <p class="project-panel-desc">{{ $project->description }}</p>
-                            
-                            <div class="project-panel-links">
-                                @if($project->github_url)
-                                    <a href="{{ $project->github_url }}" class="project-panel-link" target="_blank">
-                                        <i class="fa-brands fa-github"></i> Código Fuente
-                                    </a>
-                                @endif
-                                @if($project->project_url)
-                                    <a href="{{ $project->project_url }}" class="project-panel-link" target="_blank">
-                                        <i class="fa-solid fa-arrow-up-right-from-square"></i> Demo En Vivo
-                                    </a>
-                                @endif
-                            </div>
-                        </div>
-                    </article>
-                @endforeach
-                
-                @if($featuredProjects->count() < 2)
-                    <!-- Placeholder panel if there's only 1 project -->
-                    <article class="project-panel" style="background-color: #0c0c12;">
-                        <div class="project-panel-overlay" style="background: rgba(5,5,5,0.7);"></div>
-                        <div class="project-panel-content" style="text-align: center; padding-bottom: 20%; transform: none; opacity: 1;">
-                            <i class="fa-solid fa-code" style="font-size: 3rem; color: rgba(255,255,255,0.1); margin-bottom: 1.5rem;"></i>
-                            <h3 class="project-panel-title" style="color: rgba(255,255,255,0.3); font-size: 1.75rem;">Próximamente más proyectos</h3>
-                        </div>
-                    </article>
-                @endif
-            </div>
-
-            <!-- Bottom Center Round Button -->
-            <button class="projects-more-btn" onclick="openProjectsModal()">
-                <span>Otros</span>
-            </button>
+            <!-- Fallback to main photoUrl background -->
+            <div class="bio-slide-bg active" style="background-image: url('{{ $photoUrl }}');"></div>
         @endif
+
+        <!-- Dark gradient overlay for text readability -->
+        <div class="bio-fullscreen-overlay"></div>
+        
+        <!-- Large outline Title in the background -->
+        <h1 class="bio-large-title-outline">{{ $profile->bio_title ?? 'YO' }}</h1>
+        
+        <div class="editorial-header-global">
+            <div>
+                <span class="editorial-tag-global">01 / BIOGRAFÍA & PERFIL</span>
+            </div>
+        </div>
+
+        <div class="bio-fullscreen-container">
+            <div class="bio-only-text-container">
+                <p class="bio-clean-text">
+                    {{ $profile->bio_description ?? 'Soy Juan Carlos Chahuayo Martinez, estudiante de Ingeniería de Sistemas y fundador de CreativeUP Studio. Me dedico principalmente al desarrollo web y la Inteligencia Artificial, fusionando ambas áreas para crear soluciones innovadoras. Mi enfoque está en construir plataformas web escalables y robustas, integrándolas con modelos de IA, visión artificial y análisis de datos para resolver desafíos complejos y generar un impacto tecnológico real.' }}
+                </p>
+            </div>
+        </div>
     </section>
 
-    <!-- All Projects Modal Overlay -->
-    <div id="projectsModal" class="projects-modal-overlay">
-        <div class="projects-modal-container glass">
-            <button class="projects-modal-close" onclick="closeProjectsModal()" aria-label="Cerrar galería">
-                <i class="fa-solid fa-xmark"></i>
-            </button>
-            <div class="projects-modal-header">
-                <span class="section-subtitle">Portafolio</span>
-                <h2 class="section-title">Galería de <span class="text-gradient">Proyectos</span></h2>
+    <!-- Habilidades Section — Clean Educational & Tech Logos Layout -->
+    <section id="habilidades" class="skills-section-modern" style="background-image: url('{{ $techBgUrl }}'); position: relative;">
+        <!-- Dark gradient overlay for text readability -->
+        <div class="skills-bg-overlay"></div>
+
+        <div class="editorial-header-global">
+            <div>
+                <span class="editorial-tag-global">02 / HABILIDADES & CONOCIMIENTOS</span>
             </div>
-            
+        </div>
+
+        <div class="skills-container-modern">
+            <div class="skills-content-modern">
+                <!-- UNCP Learning Text Block -->
+                <div class="skills-text-block">
+                    <p class="skills-uncp-text">
+                        @if($profile && $profile->tech_desc)
+                            {!! nl2br(e($profile->tech_desc)) !!}
+                        @else
+                            Actualmente cursando el <strong>noveno ciclo de Ingeniería de Sistemas en la Universidad Nacional del Centro del Perú (UNCP)</strong>, he consolidado una sólida base teórica y práctica en el desarrollo de software. Mi formación universitaria me ha permitido profundizar en la optimización de algoritmos, administración de bases de datos avanzadas y el diseño arquitectónico de sistemas. Gracias a esta preparación académica, he aprendido a integrar metodologías ágiles como Scrum y herramientas DevOps para gestionar proyectos de manera estructurada e innovadora.
+                        @endif
+                    </p>
+                </div>
+
+                <!-- Technologies Logos (No Cards, Original Colors) -->
+                <div class="tech-logos-grid-clean">
+                    @forelse($skills as $skill)
+                        <div class="tech-logo-item">
+                            @if($skill->icon_class)
+                                <i class="{{ $skill->icon_class }} colored"></i>
+                            @else
+                                <i class="fa-solid fa-code"></i>
+                            @endif
+                            <span>{{ $skill->name }}</span>
+                        </div>
+                    @empty
+                        <div class="tech-logo-item">
+                            <i class="devicon-python-plain colored"></i>
+                            <span>PYTHON</span>
+                        </div>
+                        <div class="tech-logo-item">
+                            <i class="devicon-git-plain colored"></i>
+                            <span>GIT</span>
+                        </div>
+                        <div class="tech-logo-item">
+                            <i class="devicon-microsoftsqlserver-plain colored"></i>
+                            <span>SQL Server</span>
+                        </div>
+                        <div class="tech-logo-item">
+                            <i class="devicon-javascript-plain colored"></i>
+                            <span>JS</span>
+                        </div>
+                        <div class="tech-logo-item">
+                            <i class="devicon-php-plain colored"></i>
+                            <span>PHP</span>
+                        </div>
+                        <div class="tech-logo-item">
+                            <i class="devicon-mysql-plain colored"></i>
+                            <span>MYSQL</span>
+                        </div>
+                        <div class="tech-logo-item">
+                            <i class="devicon-amazonwebservices-original colored"></i>
+                            <span>AWS</span>
+                        </div>
+                        <div class="tech-logo-item">
+                            <i class="fa-solid fa-people-group colored"></i>
+                            <span>SCRUM</span>
+                        </div>
+                        <div class="tech-logo-item">
+                            <i class="fa-solid fa-diagram-project colored"></i>
+                            <span>Gestión de Proyectos</span>
+                        </div>
+                        <div class="tech-logo-item">
+                            <i class="fa-solid fa-sitemap colored"></i>
+                            <span>Arq. de Software</span>
+                        </div>
+                        <div class="tech-logo-item">
+                            <i class="fa-solid fa-rotate colored"></i>
+                            <span>Met. Ágiles</span>
+                        </div>
+                    @endforelse
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Projects Section — Premium Dark Editorial with Tech Cards -->
+    <section id="proyectos" class="projects-section-modern section-fullscreen">
+        <div class="editorial-header-global">
+            <div>
+                <span class="editorial-tag-global">03 / PORTAFOLIO</span>
+                <h2 class="editorial-title-global">Proyectos <span style="background: linear-gradient(135deg, var(--insta-purple) 0%, var(--insta-magenta) 50%, var(--insta-orange) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Destacados</span></h2>
+            </div>
+            <span style="font-size: 0.82rem; font-weight: 600; color: rgba(255,255,255,0.4); font-family: 'Outfit', sans-serif;">{{ $projects->count() }} PROYECTOS DISPONIBLES</span>
+        </div>
+
+        <div class="section-inner-wrapper">
+
             @if($projects->isEmpty())
-                <p style="color: var(--text-muted); text-align: center;">No hay proyectos para mostrar.</p>
+                <div style="grid-column: 1 / -1; text-align: center; padding: 4rem 0; color: rgba(255,255,255,0.5); background: rgba(255,255,255,0.02); border-radius: 20px; border: 1px solid rgba(255,255,255,0.08); width: 100%;">
+                    <i class="fa-solid fa-diagram-project" style="font-size: 2.5rem; margin-bottom: 1rem; color: var(--insta-orange);"></i>
+                    <p>No hay proyectos registrados actualmente. ¡Vuelve pronto!</p>
+                </div>
             @else
-                <div class="projects-modal-grid">
-                    @foreach($projects as $project)
-                        <article class="project-card glass">
-                            <div class="project-image-container">
-                                @if($project->image_path)
-                                    <img src="{{ asset($project->image_path) }}" alt="{{ $project->title }}" class="project-image">
-                                @else
-                                    <div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; background:var(--bg-card); color:var(--text-muted); font-size:3rem;">
-                                        <i class="fa-solid fa-network-wired"></i>
-                                    </div>
-                                @endif
-                            </div>
-                            <div class="project-body">
-                                <h3 class="project-title">{{ $project->title }}</h3>
-                                <p class="project-desc">{{ $project->description }}</p>
-                                
-                                <div class="project-tags">
-                                    @foreach($project->tech_stack_array as $tech)
-                                        <span class="project-tag">{{ $tech }}</span>
-                                    @endforeach
-                                </div>
-                                
-                                <div class="project-links">
-                                    @if($project->github_url)
-                                        <a href="{{ $project->github_url }}" class="project-link" target="_blank">
-                                            <i class="fa-brands fa-github"></i> Código
-                                        </a>
+                <!-- Grid Container -->
+                <div class="proj-grid">
+                    @php
+                        $sortedProjects = $projects->sortByDesc('created_at');
+                        $visibleProjects = $sortedProjects->take(2);
+                        $hiddenProjects = $sortedProjects->slice(2);
+                    @endphp
+
+                    @foreach($visibleProjects as $index => $project)
+                        <article class="proj-card" style="animation-delay: {{ $index * 0.15 }}s;">
+                            <!-- Image -->
+                            <div class="proj-card-img">
+                                <a href="{{ route('portfolio.projects.show', $project) }}" style="display: block; width: 100%; height: 100%;">
+                                    @if($project->image_path)
+                                        <img src="{{ asset($project->image_path) }}" alt="{{ $project->title }}" loading="lazy">
+                                    @else
+                                        <div class="proj-card-placeholder">
+                                            <i class="fa-solid fa-code"></i>
+                                        </div>
                                     @endif
+                                </a>
+                                <span class="proj-card-number">{{ str_pad($index + 1, 2, '0', STR_PAD_LEFT) }}</span>
+                                <!-- Hover Overlay with Links -->
+                                <div class="proj-card-img-overlay">
+                                    <a href="{{ route('portfolio.projects.show', $project) }}" class="proj-overlay-link" title="Ver Detalles del Proyecto">
+                                        <i class="fa-solid fa-eye"></i>
+                                    </a>
                                     @if($project->project_url)
-                                        <a href="{{ $project->project_url }}" class="project-link" target="_blank" style="color: var(--text-primary); text-decoration: underline;">
-                                            <i class="fa-solid fa-arrow-up-right-from-square"></i> Demo En Vivo
+                                        <a href="{{ $project->project_url }}" target="_blank" class="proj-overlay-link" title="Ver Demo en Vivo">
+                                            <i class="fa-solid fa-arrow-up-right-from-square"></i>
                                         </a>
                                     @endif
+                                    @if($project->github_url)
+                                        <a href="{{ $project->github_url }}" target="_blank" class="proj-overlay-link" title="Ver Código en GitHub">
+                                            <i class="fa-brands fa-github"></i>
+                                        </a>
+                                    @endif
+                                </div>
+                            </div>
+
+                            <!-- Body -->
+                            <div class="proj-card-body">
+                                <h3 class="proj-card-title">
+                                    <a href="{{ route('portfolio.projects.show', $project) }}" style="color: inherit; text-decoration: none;">
+                                        {{ $project->title }}
+                                    </a>
+                                </h3>
+                                <p class="proj-card-desc">{{ Str::limit($project->description, 120) }}</p>
+
+                                <!-- Tech Tags -->
+                                <div class="proj-card-tags">
+                                    @foreach(array_slice($project->tech_stack_array, 0, 5) as $tech)
+                                        <span class="proj-tag">{{ $tech }}</span>
+                                    @endforeach
+                                    @if(count($project->tech_stack_array) > 5)
+                                        <span class="proj-tag proj-tag-more">+{{ count($project->tech_stack_array) - 5 }}</span>
+                                    @endif
+                                </div>
+
+                                <!-- Footer Action: Signature Sliding Arrow Button -->
+                                <div class="proj-card-footer">
+                                    <a href="{{ route('portfolio.projects.show', $project) }}" class="btn-view-project">
+                                        <span>Ver Proyecto</span>
+                                    </a>
                                 </div>
                             </div>
                         </article>
                     @endforeach
                 </div>
-            @endif
-        </div>
-    </div>
 
-    <!-- Skills Categorized Section -->
-    <section id="habilidades" style="background-color: rgba(255,255,255,0.01);">
-        <div class="section-header">
-            <span class="section-subtitle">Conocimientos</span>
-            <h2 class="section-title">Habilidades <span class="text-gradient">Técnicas</span></h2>
-        </div>
-
-        @if($skillsGrouped->isEmpty())
-            <div style="text-align: center; padding: 4rem 0; color: var(--text-muted); background: var(--bg-card); border-radius: 16px; border: 1px solid var(--border-color);">
-                <i class="fa-solid fa-brain" style="font-size: 2.5rem; margin-bottom: 1rem; color: var(--accent-purple);"></i>
-                <p>Las habilidades técnicas se cargarán próximamente.</p>
-            </div>
-        @else
-            <div class="skills-container">
-                @foreach($skillsGrouped as $category => $skills)
-                    <div class="skills-category-card glass">
-                        <h3 class="skills-category-title">
-                            <i class="fa-solid fa-code-branch" style="margin-right: 0.5rem; font-size: 0.95rem;"></i>
-                            {{ $category }}
-                        </h3>
-                        <div class="skill-list">
-                            @foreach($skills as $skill)
-                                <div class="skill-item">
-                                    <div class="skill-info">
-                                        <span class="skill-name">
-                                            @if($skill->icon_class)
-                                                <i class="{{ $skill->icon_class }}" style="margin-right: 0.35rem; color: var(--accent-cyan);"></i>
-                                            @endif
-                                            {{ $skill->name }}
-                                        </span>
-                                        <span class="skill-percent">{{ $skill->proficiency }}%</span>
-                                    </div>
-                                    <div class="skill-bar-bg">
-                                        <div class="skill-bar-fill" data-percent="{{ $skill->proficiency }}%"></div>
+                @if($hiddenProjects->isNotEmpty())
+                    <!-- Hidden projects grid -->
+                    <div id="hidden-projects-grid" class="proj-grid" style="display: none; opacity: 0; transition: all 0.5s ease; margin-top: 2.5rem;">
+                        @foreach($hiddenProjects as $index => $project)
+                            <article class="proj-card">
+                                <div class="proj-card-img">
+                                    <a href="{{ route('portfolio.projects.show', $project) }}" style="display: block; width: 100%; height: 100%;">
+                                        @if($project->image_path)
+                                            <img src="{{ asset($project->image_path) }}" alt="{{ $project->title }}" loading="lazy">
+                                        @else
+                                            <div class="proj-card-placeholder">
+                                                <i class="fa-solid fa-code"></i>
+                                            </div>
+                                        @endif
+                                    </a>
+                                    <span class="proj-card-number">{{ str_pad($index + 3, 2, '0', STR_PAD_LEFT) }}</span>
+                                    <div class="proj-card-img-overlay">
+                                        <a href="{{ route('portfolio.projects.show', $project) }}" class="proj-overlay-link" title="Ver Detalles del Proyecto">
+                                            <i class="fa-solid fa-eye"></i>
+                                        </a>
+                                        @if($project->project_url)
+                                            <a href="{{ $project->project_url }}" target="_blank" class="proj-overlay-link" title="Ver Demo en Vivo">
+                                                <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                                            </a>
+                                        @endif
+                                        @if($project->github_url)
+                                            <a href="{{ $project->github_url }}" target="_blank" class="proj-overlay-link" title="Ver Código en GitHub">
+                                                <i class="fa-brands fa-github"></i>
+                                            </a>
+                                        @endif
                                     </div>
                                 </div>
-                            @endforeach
-                        </div>
+                                <div class="proj-card-body">
+                                    <h3 class="proj-card-title">
+                                        <a href="{{ route('portfolio.projects.show', $project) }}" style="color: inherit; text-decoration: none;">
+                                            {{ $project->title }}
+                                        </a>
+                                    </h3>
+                                    <p class="proj-card-desc">{{ Str::limit($project->description, 120) }}</p>
+                                    <div class="proj-card-tags">
+                                        @foreach(array_slice($project->tech_stack_array, 0, 5) as $tech)
+                                            <span class="proj-tag">{{ $tech }}</span>
+                                        @endforeach
+                                        @if(count($project->tech_stack_array) > 5)
+                                            <span class="proj-tag proj-tag-more">+{{ count($project->tech_stack_array) - 5 }}</span>
+                                        @endif
+                                    </div>
+                                    <div class="proj-card-footer">
+                                        <a href="{{ route('portfolio.projects.show', $project) }}" class="btn-view-project">
+                                            <span>Ver Proyecto</span>
+                                        </a>
+                                    </div>
+                                </div>
+                            </article>
+                        @endforeach
                     </div>
-                @endforeach
-            </div>
-        @endif
+
+                    <!-- Show More Button: Signature Sliding Arrow Animation -->
+                    <div style="text-align: center; margin-top: 3.5rem;">
+                        <button id="btn-toggle-projects" class="new-projects-toggle-btn" onclick="toggleMoreProjects()">
+                            <span>Ver más proyectos</span>
+                        </button>
+                    </div>
+
+                    <script>
+                        function toggleMoreProjects() {
+                            var container = document.getElementById('hidden-projects-grid');
+                            var btn = document.getElementById('btn-toggle-projects');
+                            var section = document.getElementById('proyectos');
+                            
+                            if (container.style.display === 'none') {
+                                container.style.display = 'grid';
+                                container.offsetHeight; // trigger reflow
+                                container.style.opacity = '1';
+                                section.style.height = 'auto';
+                                section.style.minHeight = 'auto';
+                                section.style.overflow = 'visible';
+                                btn.querySelector('span').textContent = 'Ver menos proyectos';
+                            } else {
+                                container.style.opacity = '0';
+                                setTimeout(function() {
+                                    container.style.display = 'none';
+                                    section.scrollIntoView({ behavior: 'smooth' });
+                                }, 500);
+                                btn.querySelector('span').textContent = 'Ver más proyectos';
+                            }
+                        }
+                    </script>
+                @endif
+            @endif
+        </div>
     </section>
 
-    <!-- Travel Gallery Section -->
-    <section id="viajes" style="background-color: rgba(255,255,255,0.005); border-top: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color);">
-        <div class="section-header">
-            <span class="section-subtitle">Exploración</span>
-            <h2 class="section-title">Viajes & <span class="text-gradient">Bitácora</span></h2>
+    <!-- Travel Gallery & Bitácora Section — Editorial Photography Layout -->
+    <section id="viajes" class="travel-section-modern section-fullscreen">
+        <div class="editorial-header-global">
+            <div>
+                <span class="editorial-tag-global">04 / EXPLORACIÓN & BITÁCORA</span>
+                <h2 class="editorial-title-global">Viajes & <span style="background: linear-gradient(135deg, var(--insta-purple) 0%, var(--insta-magenta) 50%, var(--insta-orange) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Bitácora</span></h2>
+            </div>
+            <span style="font-size: 0.82rem; font-weight: 600; color: rgba(255,255,255,0.4); font-family: 'Outfit', sans-serif;">{{ $travels->count() }} DESTINOS EXPLORADOS</span>
         </div>
 
-        <div class="travel-container">
-            @if($travels->isEmpty())
-                <div style="grid-column: 1 / -1; text-align: center; padding: 4rem 0; color: var(--text-muted); background: var(--bg-card); border-radius: 16px; border: 1px solid var(--border-color); width: 100%;">
-                    <i class="fa-solid fa-plane-departure" style="font-size: 2.5rem; margin-bottom: 1rem; color: var(--accent-cyan);"></i>
-                    <p>Pronto se añadirán nuevos destinos y bitácoras de viajes. ¡Vuelve pronto!</p>
-                </div>
-            @else
-                @foreach($travels as $travel)
-                    <article class="travel-card glass">
-                        <div class="travel-image-container">
+        <div class="section-inner-wrapper">
+
+            <div class="travel-grid-modern">
+                @if($travels->isEmpty())
+                    <div style="grid-column: 1 / -1; text-align: center; padding: 4rem 0; color: rgba(255,255,255,0.5); background: rgba(255,255,255,0.02); border-radius: 20px; border: 1px solid rgba(255,255,255,0.08); width: 100%;">
+                        <i class="fa-solid fa-plane-departure" style="font-size: 2.5rem; margin-bottom: 1rem; color: var(--insta-orange);"></i>
+                        <p>Pronto se añadirán nuevos destinos y bitácoras de viajes. ¡Vuelve pronto!</p>
+                    </div>
+                @else
+                    @foreach($travels as $travel)
+                        <article class="travel-card-modern">
+                            <a href="{{ route('portfolio.travels.show', $travel) }}" style="display: block; width: 100%; height: 100%; position: absolute; inset: 0; z-index: 1;"></a>
+                            
                             @if($travel->image_path)
-                                <img src="{{ asset($travel->image_path) }}" alt="{{ $travel->title }}" class="travel-image">
+                                <img src="{{ asset($travel->image_path) }}" alt="{{ $travel->title }}" class="travel-card-img">
                             @else
-                                <div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: var(--bg-card); color: var(--text-muted); font-size: 2rem;">
+                                <div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: #0d0d12; color: rgba(255,255,255,0.2); font-size: 3rem;">
                                     <i class="fa-solid fa-map-location-dot"></i>
                                 </div>
                             @endif
-                            @if($travel->badge)
-                                <span class="travel-badge">{{ $travel->badge }}</span>
-                            @endif
-                        </div>
-                        <div class="travel-body">
-                            <h3 class="travel-card-title">{{ $travel->title }}</h3>
-                            <p class="travel-desc">{{ $travel->description }}</p>
-                            <div class="travel-meta">
-                                @if($travel->meta_1_text)
-                                    <span><i class="{{ $travel->meta_1_icon ?? 'fa-solid fa-plane-departure' }}"></i> {{ $travel->meta_1_text }}</span>
-                                @endif
-                                @if($travel->meta_2_text)
-                                    <span><i class="{{ $travel->meta_2_icon ?? 'fa-solid fa-camera' }}"></i> {{ $travel->meta_2_text }}</span>
-                                @endif
+
+                            <div class="travel-card-gradient"></div>
+
+                            <span class="travel-card-badge">
+                                {{ $travel->location ?? $travel->badge ?? 'Destino' }} · {{ $travel->year ?? '2025' }}
+                            </span>
+
+                            <div class="travel-card-content" style="position: relative; z-index: 2;">
+                                <h3 class="travel-card-title">
+                                    <a href="{{ route('portfolio.travels.show', $travel) }}" style="color: inherit; text-decoration: none;">
+                                        {{ $travel->title }}
+                                    </a>
+                                </h3>
+                                <p class="travel-card-desc">{{ Str::limit($travel->description, 100) }}</p>
+                                
+                                <div class="travel-card-meta">
+                                    <span>
+                                        <i class="fa-solid fa-location-dot"></i>
+                                        {{ $travel->location ?? $travel->badge ?? 'Lugar' }}@if($travel->country), {{ $travel->country }}@endif
+                                    </span>
+                                    <span>
+                                        <i class="fa-regular fa-calendar"></i>
+                                        {{ $travel->year ?? '2025' }}
+                                    </span>
+                                </div>
+
+                                <div style="margin-top: 1.25rem;">
+                                    <a href="{{ route('portfolio.travels.show', $travel) }}" class="btn-view-project">
+                                        <span>Ver Bitácora</span>
+                                    </a>
+                                </div>
                             </div>
-                        </div>
-                    </article>
-                @endforeach
-            @endif
+                        </article>
+                    @endforeach
+                @endif
+            </div>
         </div>
     </section>
 
     <!-- Contact & Message Submission Section -->
-    <section id="contacto">
-        <div class="section-header">
-            <span class="section-subtitle">Contacto</span>
-            <h2 class="section-title">Trabajemos <span class="text-gradient">Juntos</span></h2>
+    <section id="contacto" class="section-fullscreen contact-section">
+        <div class="editorial-header-global">
+            <div>
+                <span class="editorial-tag-global">05 / CONTACTO & CONTRATACIÓN</span>
+                <h2 class="editorial-title-global">Trabajemos <span style="background: linear-gradient(135deg, var(--insta-purple) 0%, var(--insta-magenta) 50%, var(--insta-orange) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Juntos</span></h2>
+            </div>
         </div>
+
+        <div class="section-inner-wrapper" style="max-width: 1200px;">
 
         <div class="contact-container">
             <!-- Left Info Panel -->
@@ -630,7 +626,7 @@
                 <form action="{{ route('portfolio.contact') }}#contacto" method="POST">
                     @csrf
                     
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    <div class="contact-form-grid">
                         <div class="form-group">
                             <label for="form_name" class="form-label">Tu Nombre *</label>
                             <input type="text" name="name" id="form_name" class="form-input" placeholder="Ej. Juan Pérez" value="{{ old('name') }}" required>
@@ -661,9 +657,9 @@
                         @enderror
                     </div>
 
-                    <button type="submit" class="btn-primary" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
-                        <i class="fa-solid fa-paper-plane"></i> Enviar Mensaje
-                    </button>
+                    <div style="margin-top: 1.5rem;">
+                        <button type="submit" class="btn-primary">Enviar Mensaje</button>
+                    </div>
                 </form>
             </div>
         </div>
@@ -808,6 +804,17 @@
                     closeProjectsModal();
                 }
             });
+        }
+
+        // Biography section background slideshow cross-fade
+        const bioSlides = document.querySelectorAll('.bio-slide-bg');
+        if (bioSlides.length > 1) {
+            let currentBioSlide = 0;
+            setInterval(() => {
+                bioSlides[currentBioSlide].classList.remove('active');
+                currentBioSlide = (currentBioSlide + 1) % bioSlides.length;
+                bioSlides[currentBioSlide].classList.add('active');
+            }, 6000); // changes background every 6 seconds
         }
     </script>
 </body>

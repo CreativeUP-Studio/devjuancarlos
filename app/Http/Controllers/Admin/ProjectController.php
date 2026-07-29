@@ -33,6 +33,8 @@ class ProjectController extends Controller
         $request->validate([
             'title' => ['required', 'string', 'max:255'],
             'description' => ['required', 'string'],
+            'steps' => ['nullable', 'string'],
+            'features' => ['nullable', 'string'],
             'tech_stack' => ['required', 'string'], // comma-separated values
             'project_url' => ['nullable', 'url', 'max:255'],
             'github_url' => ['nullable', 'url', 'max:255'],
@@ -40,7 +42,7 @@ class ProjectController extends Controller
             'order' => ['required', 'integer'],
         ]);
 
-        $data = $request->only(['title', 'description', 'tech_stack', 'project_url', 'github_url', 'order']);
+        $data = $request->only(['title', 'description', 'steps', 'features', 'tech_stack', 'project_url', 'github_url', 'order']);
 
         if ($request->hasFile('image')) {
             $image = $request->file('image');
@@ -70,6 +72,8 @@ class ProjectController extends Controller
         $request->validate([
             'title' => ['required', 'string', 'max:255'],
             'description' => ['required', 'string'],
+            'steps' => ['nullable', 'string'],
+            'features' => ['nullable', 'string'],
             'tech_stack' => ['required', 'string'],
             'project_url' => ['nullable', 'url', 'max:255'],
             'github_url' => ['nullable', 'url', 'max:255'],
@@ -77,7 +81,7 @@ class ProjectController extends Controller
             'order' => ['required', 'integer'],
         ]);
 
-        $data = $request->only(['title', 'description', 'tech_stack', 'project_url', 'github_url', 'order']);
+        $data = $request->only(['title', 'description', 'steps', 'features', 'tech_stack', 'project_url', 'github_url', 'order']);
 
         if ($request->hasFile('image')) {
             // Delete old image if it exists

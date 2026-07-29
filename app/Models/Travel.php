@@ -13,8 +13,16 @@ class Travel extends Model
 
     protected $fillable = [
         'title',
+        'location',
+        'country',
+        'year',
+        'travel_date',
         'description',
+        'content',
         'image_path',
+        'audio_path',
+        'media_type',
+        'video_path',
         'badge',
         'meta_1_icon',
         'meta_1_text',

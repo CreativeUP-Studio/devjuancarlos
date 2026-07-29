@@ -13,8 +13,9 @@ class SkillController extends Controller
      */
     public function index()
     {
-        $skills = Skill::orderBy('category')->orderBy('order')->orderBy('name')->get();
-        return view('admin.skills.index', compact('skills'));
+        $profile = \App\Models\Profile::first() ?? new \App\Models\Profile();
+        $skills = Skill::orderBy('order')->orderBy('name')->get();
+        return view('admin.skills.index', compact('profile', 'skills'));
     }
 
     /**
@@ -78,5 +79,67 @@ class SkillController extends Controller
     {
         $skill->delete();
         return redirect()->route('admin.skills.index')->with('success', 'La habilidad técnica ha sido eliminada exitosamente.');
+    }
+
+    /**
+     * Update the skills section text (UNCP).
+     */
+    public function updateText(Request $request)
+    {
+        $request->validate([
+            'tech_desc' => ['nullable', 'string'],
+            'tech_image' => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif,webp', 'max:10240'],
+        ]);
+
+        $profile = \App\Models\Profile::first() ?? new \App\Models\Profile();
+        $profile->tech_desc = $request->tech_desc;
+
+        // Delete background image if requested
+        if ($request->has('delete_tech_image')) {
+            if ($profile->tech_image && file_exists(public_path($profile->tech_image))) {
+                @unlink(public_path($profile->tech_image));
+            }
+            $profile->tech_image = null;
+        }
+
+        // Upload new background image
+        if ($request->hasFile('tech_image')) {
+            // Delete previous image if exists
+            if ($profile->tech_image && file_exists(public_path($profile->tech_image))) {
+                @unlink(public_path($profile->tech_image));
+            }
+
+            // Create uploads folder if it doesn't exist
+            if (!file_exists(public_path('uploads'))) {
+                @mkdir(public_path('uploads'), 0777, true);
+            }
+
+            $file = $request->file('tech_image');
+            $fileName = 'tech_bg_' . time() . '.' . $file->getClientOriginalExtension();
+            $file->move(public_path('uploads'), $fileName);
+            $profile->tech_image = 'uploads/' . $fileName;
+        }
+
+        if (!$profile->exists) {
+            $profile->name = 'Juan Carlos Chahuayo Martínez';
+            $profile->title = 'Estudiante de Ingeniería de Sistemas';
+            $profile->bio = 'Listo para crear y no parar';
+        }
+
+        $profile->save();
+
+        return redirect()->route('admin.skills.index')->with('success', 'El texto e imagen de la sección de habilidades han sido actualizados exitosamente.');
+    }
+
+    /**
+     * Toggle visibility of the technical skill.
+     */
+    public function toggleVisibility(Skill $skill)
+    {
+        $skill->is_visible = !$skill->is_visible;
+        $skill->save();
+
+        $status = $skill->is_visible ? 'visible' : 'oculta';
+        return redirect()->route('admin.skills.index')->with('success', "La tecnología \"{$skill->name}\" ahora está {$status}.");
     }
 }

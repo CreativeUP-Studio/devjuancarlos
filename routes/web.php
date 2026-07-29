@@ -11,6 +11,8 @@ use Illuminate\Support\Facades\Route;
 
 // Public Routes
 Route::get('/', [PortfolioController::class, 'index'])->name('portfolio.index');
+Route::get('/proyecto/{project}', [PortfolioController::class, 'showProject'])->name('portfolio.projects.show');
+Route::get('/viaje/{travel}', [PortfolioController::class, 'showTravel'])->name('portfolio.travels.show');
 Route::post('/contact', [PortfolioController::class, 'contact'])->name('portfolio.contact');
 
 // Admin Auth Routes
@@ -32,6 +34,8 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     Route::resource('projects', ProjectController::class)->except(['show']);
 
     // Skills CRUD
+    Route::post('/skills/update-text', [SkillController::class, 'updateText'])->name('skills.update-text');
+    Route::patch('/skills/{skill}/toggle-visibility', [SkillController::class, 'toggleVisibility'])->name('skills.toggle-visibility');
     Route::resource('skills', SkillController::class)->except(['show']);
 
     // Travels CRUD

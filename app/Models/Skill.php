@@ -15,5 +15,10 @@ class Skill extends Model
         'proficiency',
         'icon_class',
         'order',
+        'is_visible',
+    ];
+
+    protected $casts = [
+        'is_visible' => 'boolean',
     ];
 }
