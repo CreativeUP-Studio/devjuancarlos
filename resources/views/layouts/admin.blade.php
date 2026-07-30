@@ -876,6 +876,14 @@
                     <div class="nav-link-indicator"></div>
                 </a>
                 
+                <a href="{{ route('admin.account.edit') }}" class="admin-nav-link {{ Route::is('admin.account.*') ? 'active' : '' }}">
+                    <div class="nav-link-icon">
+                        <i class="fa-solid fa-user-gear"></i>
+                    </div>
+                    <span class="nav-link-text">Perfil Admin</span>
+                    <div class="nav-link-indicator"></div>
+                </a>
+
                 <a href="{{ route('admin.biography.edit') }}" class="admin-nav-link {{ Route::is('admin.biography.*') ? 'active' : '' }}">
                     <div class="nav-link-icon">
                         <i class="fa-solid fa-user-astronaut"></i>
@@ -1044,9 +1052,13 @@
                             </div>
                         </div>
                         <div class="dropdown-divider"></div>
-                        <a href="{{ route('admin.biography.edit') }}" class="dropdown-menu-item">
+                        <a href="{{ route('admin.account.edit') }}" class="dropdown-menu-item">
                             <i class="fa-solid fa-user-gear"></i>
-                            <span>Editar Perfil / Biografía</span>
+                            <span>Perfil de Administrador</span>
+                        </a>
+                        <a href="{{ route('admin.biography.edit') }}" class="dropdown-menu-item">
+                            <i class="fa-solid fa-user-astronaut"></i>
+                            <span>Biografía del Portafolio</span>
                         </a>
                         <a href="{{ route('portfolio.index') }}" target="_blank" class="dropdown-menu-item">
                             <i class="fa-solid fa-arrow-up-right-from-square"></i>
@@ -1140,7 +1152,8 @@
         // Admin Search Index (Static Pages + Navigation Shortcuts)
         const adminSearchItems = [
             { title: 'Dashboard / Inicio', category: 'General', icon: 'fa-home', url: "{{ route('admin.dashboard') }}" },
-            { title: 'Editar Biografía y Perfil', category: 'Perfil', icon: 'fa-user-astronaut', url: "{{ route('admin.biography.edit') }}" },
+            { title: 'Perfil de Administrador (Avatar & Cuenta)', category: 'Perfil', icon: 'fa-user-gear', url: "{{ route('admin.account.edit') }}" },
+            { title: 'Biografía del Portafolio', category: 'Perfil', icon: 'fa-user-astronaut', url: "{{ route('admin.biography.edit') }}" },
             { title: 'Gestión de Proyectos', category: 'Proyectos', icon: 'fa-diagram-project', url: "{{ route('admin.projects.index') }}" },
             { title: 'Crear Nuevo Proyecto', category: 'Proyectos', icon: 'fa-plus-circle', url: "{{ route('admin.projects.create') }}" },
             { title: 'Habilidades & Tecnologías', category: 'Habilidades', icon: 'fa-brain', url: "{{ route('admin.skills.index') }}" },

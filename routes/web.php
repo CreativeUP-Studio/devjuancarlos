@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\AdminAccountController;
 use App\Http\Controllers\Admin\AuthController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\MessageController;
@@ -34,6 +35,10 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     // Dashboard & Profile Info
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
     Route::post('/profile', [DashboardController::class, 'updateProfile'])->name('profile.update');
+
+    // Admin Account & Avatar Management
+    Route::get('/account', [AdminAccountController::class, 'edit'])->name('account.edit');
+    Route::post('/account', [AdminAccountController::class, 'update'])->name('account.update');
 
     // Biography Management
     Route::get('/biography', [DashboardController::class, 'editBiography'])->name('biography.edit');
