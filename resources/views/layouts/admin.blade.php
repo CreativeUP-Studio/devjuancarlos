@@ -134,10 +134,10 @@
         .topbar-right { display: flex; align-items: center; gap: 1.5rem; }
         
         /* SEARCH */
-        .topbar-search { display: flex; align-items: center; gap: 0.75rem; padding: 0.65rem 1.25rem; border-radius: 14px; background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); transition: all 0.3s ease; }
+        .topbar-search { display: flex; align-items: center; gap: 0.75rem; padding: 0.65rem 1.25rem; border-radius: 14px; background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); transition: all 0.3s ease; position: relative; }
         .topbar-search:focus-within { background: rgba(255,255,255,0.06); border-color: var(--border-hover); box-shadow: 0 0 15px rgba(255,255,255,0.05); }
         .topbar-search i { color: var(--text-muted); font-size: 0.9rem; }
-        .topbar-search input { background: none; border: none; outline: none; color: #ffffff; font-size: 0.9rem; width: 190px; }
+        .topbar-search input { background: none; border: none; outline: none; color: #ffffff; font-size: 0.9rem; width: 220px; }
         .topbar-search input::placeholder { color: var(--text-muted); }
         
         /* NOTIFICATION */
@@ -147,14 +147,289 @@
         .notification-dot { position: absolute; top: 10px; right: 10px; width: 8px; height: 8px; border-radius: 50%; background: #ef4444; border: 2px solid var(--bg-panel); box-shadow: 0 0 8px #ef4444; }
         
         /* USER */
-        .topbar-user { display: flex; align-items: center; gap: 0.85rem; padding: 0.45rem 0.8rem 0.45rem 0.45rem; border-radius: 14px; background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); cursor: pointer; transition: all 0.3s ease; }
+        .topbar-user { position: relative; display: flex; align-items: center; gap: 0.85rem; padding: 0.45rem 0.8rem 0.45rem 0.45rem; border-radius: 14px; background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); cursor: pointer; transition: all 0.3s ease; }
         .topbar-user:hover { background: rgba(255,255,255,0.07); border-color: var(--border-hover); }
         .user-avatar { width: 38px; height: 38px; border-radius: 12px; overflow: hidden; background: linear-gradient(135deg, var(--insta-blue) 0%, var(--insta-orange) 100%); border: 1px solid rgba(255,255,255,0.2); }
         .user-avatar img { width: 100%; height: 100%; object-fit: cover; }
         .user-info { display: flex; flex-direction: column; gap: 0.1rem; }
         .user-name { font-size: 0.88rem; font-weight: 600; color: #ffffff; }
         .user-role { font-size: 0.72rem; color: var(--text-muted); }
-        .topbar-user > i { color: var(--text-muted); font-size: 0.8rem; margin-left: 0.25rem; }
+        .topbar-user > i { color: var(--text-muted); font-size: 0.8rem; margin-left: 0.25rem; transition: transform 0.3s ease; }
+        .topbar-user.active > i { transform: rotate(180deg); }
+
+        /* TOPBAR DROPDOWN MENUS */
+        .topbar-dropdown-menu {
+            position: absolute;
+            top: calc(100% + 12px);
+            right: 0;
+            width: 320px;
+            background: rgba(13, 14, 20, 0.95);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--border-color);
+            border-radius: 18px;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255, 255, 255, 0.05);
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(10px) scale(0.98);
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            z-index: 1000;
+            overflow: hidden;
+        }
+
+        .topbar-dropdown-menu.search-results-dropdown {
+            width: 360px;
+            right: auto;
+            left: 0;
+        }
+
+        .topbar-dropdown-menu.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0) scale(1);
+        }
+
+        .dropdown-header {
+            padding: 1rem 1.25rem;
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: #ffffff;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .dropdown-badge {
+            font-size: 0.72rem;
+            padding: 0.2rem 0.55rem;
+            border-radius: 10px;
+            background: var(--insta-magenta);
+            color: #ffffff;
+            font-weight: 700;
+        }
+
+        .notification-list, .search-results-list {
+            max-height: 320px;
+            overflow-y: auto;
+        }
+
+        .notification-item {
+            display: flex;
+            align-items: center;
+            gap: 0.85rem;
+            padding: 0.85rem 1.25rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+            text-decoration: none;
+            color: inherit;
+            transition: background 0.25s ease;
+        }
+
+        .notification-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .notification-item-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: rgba(225, 48, 108, 0.15);
+            border: 1px solid rgba(225, 48, 108, 0.3);
+            color: var(--insta-magenta);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            flex-shrink: 0;
+        }
+
+        .notification-item-info {
+            display: flex;
+            flex-direction: column;
+            gap: 0.15rem;
+            overflow: hidden;
+        }
+
+        .notification-sender {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: #ffffff;
+        }
+
+        .notification-subject {
+            font-size: 0.78rem;
+            color: var(--text-secondary);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .notification-time {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+        }
+
+        .dropdown-empty-state {
+            padding: 2rem 1rem;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+
+        .dropdown-footer {
+            padding: 0.85rem 1.25rem;
+            text-align: center;
+            border-top: 1px solid var(--border-color);
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .dropdown-footer a {
+            color: var(--insta-orange);
+            text-decoration: none;
+            font-size: 0.82rem;
+            font-weight: 700;
+            transition: color 0.25s ease;
+        }
+
+        .dropdown-footer a:hover {
+            color: #ffffff;
+        }
+
+        /* User Profile Dropdown */
+        .user-dropdown-header {
+            padding: 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.85rem;
+            background: rgba(255, 255, 255, 0.03);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .user-avatar-lg {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .user-avatar-lg img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .user-details-lg {
+            display: flex;
+            flex-direction: column;
+            gap: 0.15rem;
+            overflow: hidden;
+        }
+
+        .user-name-lg {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: #ffffff;
+        }
+
+        .user-email-lg {
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .dropdown-divider {
+            height: 1px;
+            background: var(--border-color);
+            margin: 0.35rem 0;
+        }
+
+        .dropdown-menu-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.8rem 1.25rem;
+            color: var(--text-secondary);
+            font-size: 0.88rem;
+            font-weight: 500;
+            text-decoration: none;
+            transition: all 0.25s ease;
+        }
+
+        .dropdown-menu-item i {
+            font-size: 0.95rem;
+            width: 20px;
+            text-align: center;
+            color: var(--text-muted);
+            transition: color 0.25s ease;
+        }
+
+        .dropdown-menu-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+            color: #ffffff;
+        }
+
+        .dropdown-menu-item:hover i {
+            color: var(--insta-orange);
+        }
+
+        .dropdown-menu-item.logout-item {
+            color: #f87171;
+        }
+
+        .dropdown-menu-item.logout-item i {
+            color: #f87171;
+        }
+
+        .dropdown-menu-item.logout-item:hover {
+            background: rgba(239, 68, 68, 0.1);
+            color: #ffffff;
+        }
+
+        /* Search Results Dropdown Items */
+        .search-item-group {
+            padding: 0.6rem 1.25rem 0.25rem;
+            font-size: 0.68rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--text-muted);
+            background: rgba(255,255,255,0.015);
+        }
+
+        .search-result-link {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.7rem 1.25rem;
+            text-decoration: none;
+            color: var(--text-secondary);
+            font-size: 0.88rem;
+            font-weight: 500;
+            transition: background 0.25s ease;
+        }
+
+        .search-result-link:hover {
+            background: rgba(255, 255, 255, 0.06);
+            color: #ffffff;
+        }
+
+        .search-result-icon {
+            width: 28px;
+            height: 28px;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            color: var(--insta-orange);
+            flex-shrink: 0;
+        }
         
         /* CONTENT */
         .admin-content { flex: 1; padding: 2.5rem 2.2rem; background: transparent; }
@@ -679,40 +954,113 @@
                 <button class="mobile-menu-toggle" id="mobileMenuToggle">
                     <i class="fa-solid fa-bars"></i>
                 </button>
-                <div class="topbar-breadcrumb">
+                <a href="{{ route('admin.dashboard') }}" class="topbar-breadcrumb" style="text-decoration: none;" title="Ir al Dashboard">
                     <i class="fa-solid fa-home"></i>
                     <span class="breadcrumb-separator">/</span>
                     <span class="breadcrumb-current">@yield('page_title', 'Dashboard')</span>
-                </div>
+                </a>
             </div>
             
             <div class="topbar-right">
-                <!-- Search Bar -->
+                <!-- Search Bar with Live Search Dropdown -->
                 <div class="topbar-search">
                     <i class="fa-solid fa-search"></i>
-                    <input type="text" placeholder="Buscar...">
+                    <input type="text" id="topbarSearchInput" placeholder="Buscar proyectos, viajes, mensajes..." autocomplete="off">
+                    
+                    <div class="topbar-dropdown-menu search-results-dropdown" id="searchResultsDropdown">
+                        <div class="dropdown-header">
+                            <span><i class="fa-solid fa-magnifying-glass" style="color: var(--insta-orange);"></i> Búsqueda en Admin</span>
+                            <span class="dropdown-badge" id="searchCountBadge">0 resultados</span>
+                        </div>
+                        <div class="search-results-list" id="searchResultsList">
+                            <!-- Dynamically populated via JS -->
+                        </div>
+                    </div>
                 </div>
 
-                <!-- Notifications -->
-                <div class="topbar-notification">
-                    <button class="notification-btn">
+                <!-- Notifications Dropdown -->
+                @php
+                    $unreadMessages = \App\Models\Message::where('is_read', false)->latest()->take(5)->get();
+                @endphp
+                <div class="topbar-notification" id="topbarNotificationContainer">
+                    <button class="notification-btn" id="notificationBtn" title="Notificaciones de Mensajes">
                         <i class="fa-solid fa-bell"></i>
                         @if ($unreadCount > 0)
                             <span class="notification-dot"></span>
                         @endif
                     </button>
+
+                    <div class="topbar-dropdown-menu notification-dropdown" id="notificationDropdown">
+                        <div class="dropdown-header">
+                            <span><i class="fa-solid fa-envelope" style="color: var(--insta-orange);"></i> Mensajes Recibidos</span>
+                            @if($unreadCount > 0)
+                                <span class="dropdown-badge">{{ $unreadCount }} sin leer</span>
+                            @endif
+                        </div>
+                        <div class="notification-list">
+                            @forelse($unreadMessages as $msg)
+                                <a href="{{ route('admin.messages.index') }}" class="notification-item">
+                                    <div class="notification-item-avatar">
+                                        <i class="fa-solid fa-envelope-open-text"></i>
+                                    </div>
+                                    <div class="notification-item-info">
+                                        <span class="notification-sender">{{ $msg->name }}</span>
+                                        <span class="notification-subject">{{ Str::limit($msg->subject ?? $msg->content, 42) }}</span>
+                                        <span class="notification-time">{{ $msg->created_at->diffForHumans() }}</span>
+                                    </div>
+                                </a>
+                            @empty
+                                <div class="dropdown-empty-state">
+                                    <i class="fa-solid fa-bell-slash" style="font-size: 1.5rem; color: var(--text-muted); margin-bottom: 0.5rem; display: block;"></i>
+                                    <span>No tienes mensajes nuevos sin leer.</span>
+                                </div>
+                            @endforelse
+                        </div>
+                        <div class="dropdown-footer">
+                            <a href="{{ route('admin.messages.index') }}">Ver bandeja de mensajes <i class="fa-solid fa-arrow-right" style="margin-left: 0.25rem;"></i></a>
+                        </div>
+                    </div>
                 </div>
 
-                <!-- User Profile -->
-                <div class="topbar-user">
+                <!-- User Profile Dropdown -->
+                <div class="topbar-user" id="topbarUserTrigger">
                     <div class="user-avatar">
-                        <img src="{{ Auth::user()->profile_photo ?? asset('images/default_engineer.png') }}" alt="Avatar">
+                        <img src="{{ Auth::user()?->profile_photo ?? asset('images/default_engineer.png') }}" alt="Avatar">
                     </div>
                     <div class="user-info">
-                        <span class="user-name">{{ Auth::user()->name }}</span>
+                        <span class="user-name">{{ Auth::user()?->name ?? 'Juan Carlos' }}</span>
                         <span class="user-role">Administrador</span>
                     </div>
-                    <i class="fa-solid fa-chevron-down"></i>
+                    <i class="fa-solid fa-chevron-down" id="userChevronIcon"></i>
+
+                    <div class="topbar-dropdown-menu user-dropdown" id="userDropdown">
+                        <div class="user-dropdown-header">
+                            <div class="user-avatar-lg">
+                                <img src="{{ Auth::user()?->profile_photo ?? asset('images/default_engineer.png') }}" alt="Avatar">
+                            </div>
+                            <div class="user-details-lg">
+                                <span class="user-name-lg">{{ Auth::user()?->name ?? 'Juan Carlos' }}</span>
+                                <span class="user-email-lg">{{ Auth::user()?->email ?? 'admin@studiocreativeup.com' }}</span>
+                            </div>
+                        </div>
+                        <div class="dropdown-divider"></div>
+                        <a href="{{ route('admin.biography.edit') }}" class="dropdown-menu-item">
+                            <i class="fa-solid fa-user-gear"></i>
+                            <span>Editar Perfil / Biografía</span>
+                        </a>
+                        <a href="{{ route('portfolio.index') }}" target="_blank" class="dropdown-menu-item">
+                            <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                            <span>Ver Portafolio Web</span>
+                        </a>
+                        <div class="dropdown-divider"></div>
+                        <form action="{{ route('admin.logout') }}" method="POST" style="width: 100%; margin: 0;">
+                            @csrf
+                            <button type="submit" class="dropdown-menu-item logout-item" style="width: 100%; border: none; background: none; text-align: left; cursor: pointer;">
+                                <i class="fa-solid fa-right-from-bracket"></i>
+                                <span>Cerrar Sesión</span>
+                            </button>
+                        </form>
+                    </div>
                 </div>
             </div>
         </header>
@@ -777,6 +1125,123 @@
     </div>
 
     <script>
+        // ----------------------------------------------------
+        // TOPBAR INTERACTIVE DROPDOWNS & LIVE SEARCH ENGINE
+        // ----------------------------------------------------
+        const notificationBtn = document.getElementById('notificationBtn');
+        const notificationDropdown = document.getElementById('notificationDropdown');
+        const topbarUserTrigger = document.getElementById('topbarUserTrigger');
+        const userDropdown = document.getElementById('userDropdown');
+        const topbarSearchInput = document.getElementById('topbarSearchInput');
+        const searchResultsDropdown = document.getElementById('searchResultsDropdown');
+        const searchResultsList = document.getElementById('searchResultsList');
+        const searchCountBadge = document.getElementById('searchCountBadge');
+
+        // Admin Search Index (Static Pages + Navigation Shortcuts)
+        const adminSearchItems = [
+            { title: 'Dashboard / Inicio', category: 'General', icon: 'fa-home', url: "{{ route('admin.dashboard') }}" },
+            { title: 'Editar Biografía y Perfil', category: 'Perfil', icon: 'fa-user-astronaut', url: "{{ route('admin.biography.edit') }}" },
+            { title: 'Gestión de Proyectos', category: 'Proyectos', icon: 'fa-diagram-project', url: "{{ route('admin.projects.index') }}" },
+            { title: 'Crear Nuevo Proyecto', category: 'Proyectos', icon: 'fa-plus-circle', url: "{{ route('admin.projects.create') }}" },
+            { title: 'Habilidades & Tecnologías', category: 'Habilidades', icon: 'fa-brain', url: "{{ route('admin.skills.index') }}" },
+            { title: 'Crear Nueva Habilidad', category: 'Habilidades', icon: 'fa-plus-circle', url: "{{ route('admin.skills.create') }}" },
+            { title: 'Bitácora de Viajes', category: 'Viajes', icon: 'fa-plane', url: "{{ route('admin.travels.index') }}" },
+            { title: 'Crear Nueva Bitácora de Viaje', category: 'Viajes', icon: 'fa-plus-circle', url: "{{ route('admin.travels.create') }}" },
+            { title: 'Bandeja de Mensajes Recibidos', category: 'Mensajes', icon: 'fa-envelope', url: "{{ route('admin.messages.index') }}" },
+            { title: 'Ver Portafolio Web Público', category: 'Sitio Web', icon: 'fa-arrow-up-right-from-square', url: "{{ route('portfolio.index') }}" }
+        ];
+
+        function closeAllTopbarDropdowns() {
+            notificationDropdown?.classList.remove('show');
+            userDropdown?.classList.remove('show');
+            searchResultsDropdown?.classList.remove('show');
+            topbarUserTrigger?.classList.remove('active');
+        }
+
+        // Toggle Notifications Dropdown
+        notificationBtn?.addEventListener('click', function(e) {
+            e.stopPropagation();
+            const isOpen = notificationDropdown?.classList.contains('show');
+            closeAllTopbarDropdowns();
+            if (!isOpen) {
+                notificationDropdown?.classList.add('show');
+            }
+        });
+
+        // Toggle User Profile Dropdown
+        topbarUserTrigger?.addEventListener('click', function(e) {
+            e.stopPropagation();
+            const isOpen = userDropdown?.classList.contains('show');
+            closeAllTopbarDropdowns();
+            if (!isOpen) {
+                userDropdown?.classList.add('show');
+                topbarUserTrigger?.classList.add('active');
+            }
+        });
+
+        // Prevent closing dropdown when clicking inside user menu or notification menu
+        userDropdown?.addEventListener('click', function(e) { e.stopPropagation(); });
+        notificationDropdown?.addEventListener('click', function(e) { e.stopPropagation(); });
+
+        // Live Search Input Engine
+        topbarSearchInput?.addEventListener('input', function() {
+            const query = this.value.trim().toLowerCase();
+            
+            if (query.length === 0) {
+                searchResultsDropdown?.classList.remove('show');
+                return;
+            }
+
+            const matches = adminSearchItems.filter(item => 
+                item.title.toLowerCase().includes(query) || 
+                item.category.toLowerCase().includes(query)
+            );
+
+            if (searchCountBadge) searchCountBadge.textContent = matches.length + (matches.length === 1 ? ' resultado' : ' resultados');
+
+            if (matches.length === 0) {
+                searchResultsList.innerHTML = `
+                    <div class="dropdown-empty-state">
+                        <i class="fa-solid fa-magnifying-glass" style="font-size: 1.5rem; color: var(--text-muted); margin-bottom: 0.5rem; display: block;"></i>
+                        <span>No se encontraron resultados para "${query}".</span>
+                    </div>
+                `;
+            } else {
+                let html = '';
+                let currentCat = '';
+                matches.forEach(item => {
+                    if (item.category !== currentCat) {
+                        currentCat = item.category;
+                        html += `<div class="search-item-group">${currentCat}</div>`;
+                    }
+                    html += `
+                        <a href="${item.url}" class="search-result-link">
+                            <div class="search-result-icon">
+                                <i class="fa-solid ${item.icon}"></i>
+                            </div>
+                            <span>${item.title}</span>
+                        </a>
+                    `;
+                });
+                searchResultsList.innerHTML = html;
+            }
+
+            closeAllTopbarDropdowns();
+            searchResultsDropdown?.classList.add('show');
+        });
+
+        topbarSearchInput?.addEventListener('click', function(e) {
+            e.stopPropagation();
+            if (this.value.trim().length > 0) {
+                searchResultsDropdown?.classList.add('show');
+            }
+        });
+
+        // Global Click Outside Handler to Close Dropdowns
+        document.addEventListener('click', function() {
+            closeAllTopbarDropdowns();
+        });
+
         // Mobile sidebar & backdrop overlay toggle
         const adminSidebar = document.getElementById('adminSidebar');
         const sidebarBackdrop = document.getElementById('sidebarBackdrop');
