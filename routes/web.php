@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', [PortfolioController::class, 'index'])->name('portfolio.index');
 Route::get('/proyecto/{project}', [PortfolioController::class, 'showProject'])->name('portfolio.projects.show');
 Route::get('/viaje/{travel}', [PortfolioController::class, 'showTravel'])->name('portfolio.travels.show');
+Route::get('/media/stream', [PortfolioController::class, 'streamMedia'])->name('media.stream');
 Route::post('/contact', [PortfolioController::class, 'contact'])->name('portfolio.contact');
 
 // Admin Auth Routes

@@ -104,4 +104,70 @@ class PortfolioController extends Controller
             // Add anchor to return directly to contact section
             ->withInput();
     }
+
+    /**
+     * Stream media file with HTTP 206 Partial Content byte-range support for HTML5 video/audio.
+     */
+    public function streamMedia(Request $request)
+    {
+        $path = $request->query('path');
+        if (!$path) abort(404);
+
+        // Normalize path
+        $relativePath = str_replace('storage/', '', ltrim($path, '/'));
+        $fullPath = storage_path('app/public/' . $relativePath);
+
+        if (!file_exists($fullPath)) {
+            $fullPath = public_path($path);
+        }
+
+        if (!file_exists($fullPath)) {
+            abort(404);
+        }
+
+        $size = filesize($fullPath);
+        $mime = mime_content_type($fullPath) ?: 'video/mp4';
+        $file = fopen($fullPath, 'rb');
+
+        $headers = [
+            'Content-Type' => $mime,
+            'Content-Length' => $size,
+            'Accept-Ranges' => 'bytes',
+        ];
+
+        // Check HTTP Range header
+        $httpRange = $request->header('Range') ?? ($_SERVER['HTTP_RANGE'] ?? null);
+
+        if ($httpRange) {
+            list($param, $range) = explode('=', $httpRange, 2);
+            if (strtolower($param) === 'bytes') {
+                list($start, $end) = explode('-', $range);
+                $start = intval($start);
+                $end = ($end === '') ? ($size - 1) : intval($end);
+
+                if ($start <= $end && $end < $size) {
+                    $length = $end - $start + 1;
+                    fseek($file, $start);
+                    return response()->stream(function() use ($file, $length) {
+                        $buffer = 1024 * 64;
+                        $bytesLeft = $length;
+                        while ($bytesLeft > 0 && !feof($file)) {
+                            $bytesToRead = min($buffer, $bytesLeft);
+                            echo fread($file, $bytesToRead);
+                            flush();
+                            $bytesLeft -= $bytesToRead;
+                        }
+                        fclose($file);
+                    }, 206, [
+                        'Content-Type' => $mime,
+                        'Content-Length' => $length,
+                        'Content-Range' => "bytes {$start}-{$end}/{$size}",
+                        'Accept-Ranges' => 'bytes',
+                    ]);
+                }
+            }
+        }
+
+        return response()->file($fullPath, $headers);
+    }
 }

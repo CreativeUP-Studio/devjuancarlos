@@ -452,6 +452,9 @@
                     <div class="preview-box-container" id="videoPreviewBox">
                         <video id="videoPreviewVid" controls></video>
                     </div>
+                    <div style="font-size: 0.72rem; color: rgba(255,255,255,0.45); margin-top: 0.4rem; line-height: 1.3;">
+                        💡 <strong>Recomendación:</strong> Usa videos en formato MP4 con códec <strong>H.264 (AVC)</strong> para reproducción universal inmediata en Chrome, Edge y móviles.
+                    </div>
                 </div>
             </div>
 

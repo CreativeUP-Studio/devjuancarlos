@@ -309,6 +309,36 @@
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
         }
 
+        /* Video Volume / Mute Button (Bottom Right Corner) */
+        .video-volume-btn {
+            position: absolute;
+            bottom: 1.25rem;
+            right: 1.25rem;
+            width: 46px;
+            height: 46px;
+            border-radius: 50%;
+            background: rgba(0, 0, 0, 0.65);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: #ffffff;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
+            z-index: 15;
+        }
+
+        .video-volume-btn:hover {
+            transform: scale(1.12);
+            background: rgba(255, 255, 255, 0.22);
+            border-color: rgba(255, 255, 255, 0.8);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.7);
+        }
+
         /* Right Side: Details */
         .details-right-panel {
             display: flex;
@@ -646,10 +676,19 @@
 <body>
 
     @php
+        // Helper for relative asset URL to prevent CORS/port mismatch issues with APP_URL
+        $getRelativeUrl = function(?string $path) {
+            if (empty($path)) return '';
+            if (str_starts_with($path, 'http://') || str_starts_with($path, 'https://')) return $path;
+            return '/' . ltrim($path, '/');
+        };
+
         // Media & Cover setup
         $hasCustomAudio = !empty($travel->audio_path);
-        $travelAudioUrl = $hasCustomAudio ? asset($travel->audio_path) : '';
-        $travelHeroBgUrl = $travel->image_path ? asset($travel->image_path) : asset('images/hero-bg.jpg');
+        $travelAudioUrl = $hasCustomAudio ? $getRelativeUrl($travel->audio_path) : '';
+        $travelVideoUrl = !empty($travel->video_path) ? $getRelativeUrl($travel->video_path) : '';
+        $travelVideoStreamUrl = !empty($travel->video_path) ? route('media.stream', ['path' => $travel->video_path]) : '';
+        $travelHeroBgUrl = $travel->image_path ? $getRelativeUrl($travel->image_path) : asset('images/hero-bg.jpg');
         $locationText = $travel->location ?? 'Destino Destacado';
         $countryText = $travel->country ?? 'Perú';
         $yearText = $travel->year ?? '2025';
@@ -695,29 +734,55 @@
         <div class="split-content-container">
             <!-- Left Side: Square Media Container (Photo or Video Player) -->
             <div class="square-media-card">
-                @if($travel->media_type === 'video' && $travel->video_path)
+                @if(!empty($travel->video_path) && ($travel->media_type === 'video' || empty($travel->image_path)))
                     <!-- MINIMALIST PLAY / PAUSE VIDEO PLAYER -->
-                    <div class="custom-video-wrapper" id="customVideoWrapper">
-                        <video id="customTravelVideo" poster="{{ $travelHeroBgUrl }}" autoplay loop muted playsinline>
-                            <source src="{{ asset($travel->video_path) }}" type="video/mp4">
+                    <div class="custom-video-wrapper" id="customVideoWrapper" style="background: #000 url('{{ $travelHeroBgUrl }}') center/cover no-repeat;">
+                        <video 
+                            id="customTravelVideo" 
+                            src="{{ $travelVideoStreamUrl }}" 
+                            autoplay 
+                            loop 
+                            muted 
+                            playsinline 
+                            preload="auto"
+                            style="width: 100%; height: 100%; object-fit: cover;"
+                        >
+                            <source src="{{ $travelVideoStreamUrl }}">
+                            <source src="{{ $travelVideoUrl }}">
                             Tu navegador no soporta la reproducción de video.
                         </video>
 
-                        <!-- Video Overlay Controls (Play/Pause Only) -->
+                        <!-- Video Overlay Controls (Play/Pause & Sound) -->
                         <div class="video-overlay-controls" id="videoOverlayControls">
-                            <button class="center-play-btn" id="centerPlayBtn" aria-label="Play/Pause">
+                            <button class="center-play-btn" id="centerPlayBtn" type="button" aria-label="Play/Pause">
                                 <i class="fa-solid fa-pause" id="centerPlayIcon"></i>
                             </button>
+
+                            <button class="video-volume-btn" id="videoVolumeBtn" type="button" aria-label="Mute/Unmute" title="Activar / Desactivar Sonido del Video">
+                                <i class="fa-solid fa-volume-xmark" id="videoVolumeIcon"></i>
+                            </button>
+                        </div>
+
+                        <!-- HEVC / H.265 Codec Fallback Notice -->
+                        <div id="hevcCodecNotice" style="display:none; position:absolute; bottom:1rem; left:1rem; right:1rem; z-index:25; background:rgba(15,15,20,0.92); backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px); border:1px solid rgba(245,158,11,0.45); border-radius:14px; padding:0.75rem 1rem; color:#fff; font-size:0.78rem; font-family:'Outfit',sans-serif; box-shadow:0 10px 30px rgba(0,0,0,0.5);">
+                            <div style="display:flex; align-items:center; gap:0.4rem; margin-bottom:0.25rem; color:#fbbf24; font-weight:700;">
+                                <i class="fa-solid fa-triangle-exclamation"></i> Códec H.265 / HEVC detectado
+                            </div>
+                            <div style="color:rgba(255,255,255,0.82); line-height:1.35; margin-bottom:0.5rem; font-size:0.74rem;">
+                                Tu navegador no puede decodificar este archivo directamente (grabado en H.265/HEVC). Para reproducirlo sin problema en la web, sube un video MP4 con el códec universal <strong>H.264 (AVC)</strong>.
+                            </div>
+                            <a href="{{ $travelVideoUrl }}" target="_blank" style="display:inline-flex; align-items:center; gap:0.35rem; background:linear-gradient(135deg, var(--insta-orange), var(--insta-magenta)); color:#fff; padding:0.35rem 0.75rem; border-radius:8px; font-weight:600; font-size:0.72rem; text-decoration:none;">
+                                <i class="fa-solid fa-arrow-up-right-from-square"></i> Abrir o descargar archivo de video
+                            </a>
                         </div>
                     </div>
                 @elseif($travel->image_path)
-                    <img src="{{ asset($travel->image_path) }}" alt="{{ $travel->title }}">
+                    <img src="{{ $travelHeroBgUrl }}" alt="{{ $travel->title }}">
                 @else
                     <div class="square-placeholder">
                         <i class="fa-solid fa-map-location-dot"></i>
                     </div>
                 @endif
-
             </div>
 
             <!-- Right Side: Details -->
@@ -848,21 +913,16 @@
                 }
             }
 
-            // Minimalist Play/Pause Video Controls Logic
+            // Minimalist Play/Pause & Mute/Unmute Video Controls Logic
             const videoWrapper = document.getElementById('customVideoWrapper');
             const video = document.getElementById('customTravelVideo');
             const centerPlayBtn = document.getElementById('centerPlayBtn');
             const centerPlayIcon = document.getElementById('centerPlayIcon');
+            const videoVolumeBtn = document.getElementById('videoVolumeBtn');
+            const videoVolumeIcon = document.getElementById('videoVolumeIcon');
 
             if (video && videoWrapper) {
-                function togglePlay(e) {
-                    if (e) e.stopPropagation();
-                    if (video.paused) {
-                        video.play().catch(err => console.log('Playback error:', err));
-                    } else {
-                        video.pause();
-                    }
-                }
+                let userInteracted = false;
 
                 function updatePlayState() {
                     if (video.paused) {
@@ -874,21 +934,88 @@
                     }
                 }
 
+                function updateVolumeState() {
+                    if (video.muted) {
+                        if (videoVolumeIcon) videoVolumeIcon.className = 'fa-solid fa-volume-xmark';
+                    } else {
+                        if (videoVolumeIcon) videoVolumeIcon.className = 'fa-solid fa-volume-high';
+                    }
+                }
+
+                function toggleMute(e) {
+                    if (e) e.stopPropagation();
+                    video.muted = !video.muted;
+                    updateVolumeState();
+                }
+
+                function togglePlay(e) {
+                    if (e) e.stopPropagation();
+
+                    // Unmute audio automatically on first user click
+                    if (!userInteracted && video.muted) {
+                        userInteracted = true;
+                        video.muted = false;
+                        updateVolumeState();
+                    }
+
+                    if (video.paused) {
+                        video.play().then(() => {
+                            updatePlayState();
+                        }).catch(err => {
+                            console.log('Playback error:', err);
+                            updatePlayState();
+                        });
+                    } else {
+                        video.pause();
+                        updatePlayState();
+                    }
+                }
+
                 if (centerPlayBtn) {
-                    centerPlayBtn.addEventListener('click', function(e) {
-                        e.stopPropagation();
-                        togglePlay();
-                    });
+                    centerPlayBtn.addEventListener('click', togglePlay);
+                }
+
+                if (videoVolumeBtn) {
+                    videoVolumeBtn.addEventListener('click', toggleMute);
                 }
                 
-                videoWrapper.addEventListener('click', function(e) {
-                    togglePlay();
-                });
+                videoWrapper.addEventListener('click', togglePlay);
+
+                const hevcNotice = document.getElementById('hevcCodecNotice');
+
+                function checkCodecHealth() {
+                    // If video is playing but videoWidth is 0, or if error event fired, it's HEVC (H.265) unplayable in Chrome
+                    if (video.error || (video.readyState >= 2 && video.videoWidth === 0)) {
+                        if (hevcNotice) hevcNotice.style.display = 'block';
+                    }
+                }
 
                 video.addEventListener('play', updatePlayState);
+                video.addEventListener('playing', function() {
+                    updatePlayState();
+                    videoWrapper.style.background = '#000';
+                    setTimeout(checkCodecHealth, 500);
+                });
+                video.addEventListener('loadedmetadata', checkCodecHealth);
                 video.addEventListener('pause', updatePlayState);
+                video.addEventListener('error', function(e) {
+                    console.error('Video error encountered:', video.error);
+                    if (hevcNotice) hevcNotice.style.display = 'block';
+                });
 
-                updatePlayState();
+                // Autoplay attempt (starts muted as required by browsers for autoplay)
+                video.muted = true;
+                updateVolumeState();
+                const playPromise = video.play();
+                if (playPromise !== undefined) {
+                    playPromise.then(() => {
+                        updatePlayState();
+                        setTimeout(checkCodecHealth, 500);
+                    }).catch(err => {
+                        console.log('Autoplay prevented by browser:', err);
+                        updatePlayState();
+                    });
+                }
             }
         });
     </script>

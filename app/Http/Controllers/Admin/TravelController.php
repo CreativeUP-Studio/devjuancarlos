@@ -108,12 +108,10 @@ class TravelController extends Controller
             $data['audio_path'] = 'storage/' . $storedPath;
         }
 
-        // Handle Video Upload via Storage Symlink
+        // Handle Video Upload via Storage Symlink with Auto H.264 Transcoding
         if ($request->hasFile('video')) {
-            $video = $request->file('video');
-            $videoName = 'video_' . time() . '.' . $video->getClientOriginalExtension();
-            $storedPath = $video->storeAs('uploads/videos', $videoName, 'public');
-            $data['video_path'] = 'storage/' . $storedPath;
+            $data['video_path'] = $this->processVideoUpload($request->file('video'));
+            $data['media_type'] = 'video';
         }
 
         Travel::create($data);
@@ -215,18 +213,56 @@ class TravelController extends Controller
             $data['audio_path'] = 'storage/' . $storedPath;
         }
 
-        // Handle Video Upload
+        // Handle Video Upload via Storage Symlink with Auto H.264 Transcoding
         if ($request->hasFile('video')) {
             $this->deleteFile($travel->video_path);
-            $video = $request->file('video');
-            $videoName = 'video_' . time() . '.' . $video->getClientOriginalExtension();
-            $storedPath = $video->storeAs('uploads/videos', $videoName, 'public');
-            $data['video_path'] = 'storage/' . $storedPath;
+            $data['video_path'] = $this->processVideoUpload($request->file('video'));
+            $data['media_type'] = 'video';
         }
 
         $travel->update($data);
 
         return redirect()->route('admin.travels.index')->with('success', 'El viaje ha sido actualizado exitosamente.');
+    }
+
+    /**
+     * Transcode uploaded video to H.264 (AVC) MP4 format using FFmpeg if available.
+     */
+    private function processVideoUpload($requestFile): string
+    {
+        $originalExt = strtolower($requestFile->getClientOriginalExtension());
+        $tempFileName = 'temp_video_' . time() . '_' . uniqid() . '.' . $originalExt;
+        $tempPath = $requestFile->storeAs('uploads/videos', $tempFileName, 'public');
+        $fullTempPath = storage_path('app/public/' . $tempPath);
+
+        $targetFileName = 'video_' . time() . '_' . uniqid() . '.mp4';
+        $targetRelativePath = 'uploads/videos/' . $targetFileName;
+        $fullTargetPath = storage_path('app/public/' . $targetRelativePath);
+
+        $ffmpegBinary = storage_path('app/bin/ffmpeg.exe');
+        if (!file_exists($ffmpegBinary)) {
+            $ffmpegBinary = 'ffmpeg';
+        }
+
+        // Execute FFmpeg transcoding: H.264 (AVC) + AAC audio + yuv420p pixel format
+        $cmd = sprintf(
+            '"%s" -y -i "%s" -c:v libx264 -preset fast -crf 23 -pix_fmt yuv420p -c:a aac -b:a 128k "%s" 2>&1',
+            $ffmpegBinary,
+            $fullTempPath,
+            $fullTargetPath
+        );
+
+        exec($cmd, $output, $returnCode);
+
+        if ($returnCode === 0 && file_exists($fullTargetPath) && filesize($fullTargetPath) > 0) {
+            if (file_exists($fullTempPath)) {
+                @unlink($fullTempPath);
+            }
+            return 'storage/' . $targetRelativePath;
+        }
+
+        // Fallback if transcoding failed or FFmpeg binary is absent
+        return 'storage/' . $tempPath;
     }
 
     /**

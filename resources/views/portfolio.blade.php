@@ -501,6 +501,12 @@
                                 {{ $travel->location ?? $travel->badge ?? 'Destino' }} · {{ $travel->year ?? '2025' }}
                             </span>
 
+                            @if($travel->media_type === 'video' || !empty($travel->video_path))
+                                <span style="position: absolute; top: 1.25rem; right: 1.25rem; z-index: 5; background: rgba(0,0,0,0.65); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); color: #ffffff; font-size: 0.72rem; padding: 0.3rem 0.65rem; border-radius: 20px; font-weight: 600; border: 1px solid rgba(255,255,255,0.2); display: flex; align-items: center; gap: 0.35rem; pointer-events: none;">
+                                    <i class="fa-solid fa-film" style="color: #f87171; font-size: 0.7rem;"></i> Video
+                                </span>
+                            @endif
+
                             <div class="travel-card-content" style="position: relative; z-index: 2;">
                                 <h3 class="travel-card-title">
                                     <a href="{{ route('portfolio.travels.show', $travel) }}" style="color: inherit; text-decoration: none;">
