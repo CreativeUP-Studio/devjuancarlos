@@ -243,7 +243,7 @@
             background-position: center;
             background-repeat: no-repeat;
             box-sizing: border-box;
-            padding: 90px 6% 40px;
+            padding: 95px 6% 80px;
             overflow: hidden;
         }
 
@@ -252,9 +252,9 @@
             inset: 0;
             background: linear-gradient(
                 180deg,
-                rgba(5, 5, 8, 0.85) 0%,
-                rgba(5, 5, 8, 0.72) 50%,
-                rgba(5, 5, 8, 0.92) 100%
+                rgba(5, 5, 8, 0.88) 0%,
+                rgba(5, 5, 8, 0.78) 50%,
+                rgba(5, 5, 8, 0.95) 100%
             );
             z-index: 1;
         }
@@ -262,46 +262,56 @@
         .split-content-container {
             position: relative;
             z-index: 2;
-            max-width: 1250px;
+            max-width: 1300px;
             width: 100%;
+            height: 100%;
+            max-height: calc(100vh - 175px);
             margin: 0 auto;
             display: grid;
-            grid-template-columns: minmax(320px, 440px) 1fr;
+            grid-template-columns: minmax(300px, 460px) 1fr;
             gap: 3.5rem;
             align-items: center;
-            max-height: calc(100vh - 130px);
+            justify-items: center;
         }
 
-        /* Left Side: Square Media Container (Photo or Video Player) */
+        /* Left Side: Media Container (Photo or Video Player in Natural Ratio) */
         .square-media-card {
             position: relative;
             width: 100%;
-            aspect-ratio: 1 / 1;
-            max-height: 440px;
+            height: 100%;
+            max-height: calc(100vh - 175px);
+            max-width: 460px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             border-radius: 24px;
             overflow: hidden;
             border: 1px solid rgba(255, 255, 255, 0.18);
-            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 255, 255, 0.05);
-            background: #0d0d12;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(255, 255, 255, 0.05);
+            background: #000000;
             transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.4s ease;
         }
 
         .square-media-card:hover {
-            transform: translateY(-4px) scale(1.01);
-            border-color: rgba(255, 255, 255, 0.35);
+            transform: translateY(-3px) scale(1.008);
+            border-color: rgba(255, 255, 255, 0.38);
         }
 
         .square-media-card img {
+            max-width: 100%;
+            max-height: calc(100vh - 175px);
             width: 100%;
             height: 100%;
-            object-fit: cover;
+            object-fit: contain;
             display: block;
             border-radius: 24px;
+            background: #000000;
         }
 
         .square-placeholder {
             width: 100%;
             height: 100%;
+            min-height: 320px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -317,17 +327,25 @@
             position: relative;
             width: 100%;
             height: 100%;
+            max-height: calc(100vh - 175px);
             border-radius: 24px;
             overflow: hidden;
-            background: #000;
+            background: #000000;
             cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .custom-video-wrapper video {
+            max-width: 100%;
+            max-height: calc(100vh - 175px);
             width: 100%;
             height: 100%;
-            object-fit: cover;
+            object-fit: contain;
             display: block;
+            border-radius: 24px;
+            background: #000000;
         }
 
         .video-overlay-controls {
@@ -800,7 +818,7 @@
             <div class="square-media-card">
                 @if(!empty($travel->video_path) && ($travel->media_type === 'video' || empty($travel->image_path)))
                     <!-- MINIMALIST PLAY / PAUSE VIDEO PLAYER -->
-                    <div class="custom-video-wrapper" id="customVideoWrapper" style="background: #000 url('{{ $travelHeroBgUrl }}') center/cover no-repeat;">
+                    <div class="custom-video-wrapper" id="customVideoWrapper">
                         <video 
                             id="customTravelVideo" 
                             src="{{ $travelVideoStreamUrl }}" 
