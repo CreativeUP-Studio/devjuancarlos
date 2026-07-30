@@ -407,7 +407,7 @@
                 <div class="form-group" style="margin-bottom: 0;">
                     <label for="image" class="form-label" style="color: #ffffff;">
                         <i class="fa-solid fa-image" style="color: var(--insta-orange); margin-right: 0.35rem;"></i>
-                        Imagen de Fondo 100vh * <span style="font-size: 0.72rem; color: #f87171; text-transform: none;">(Máx. 15 MB)</span>
+                        Imagen de Fondo 100vh * <span style="font-size: 0.72rem; color: #4ade80; text-transform: none;">(Fotos HD / Gran Peso hasta 100 MB)</span>
                     </label>
 
                     <div class="file-dropzone-custom">
@@ -417,7 +417,7 @@
                                 <i class="fa-solid fa-cloud-arrow-up"></i>
                             </div>
                             <div class="dropzone-info-text">
-                                <span class="dropzone-btn-title"><i class="fa-solid fa-folder-open"></i> Subir Imagen de Fondo</span>
+                                <span class="dropzone-btn-title"><i class="fa-solid fa-folder-open"></i> Subir Imagen (Alta Calidad)</span>
                                 <span class="dropzone-file-name" id="imgFileName">Ningún archivo seleccionado</span>
                             </div>
                         </div>
@@ -432,18 +432,18 @@
                 <div class="form-group" style="margin-bottom: 0;">
                     <label for="video" class="form-label" style="color: #ffffff;">
                         <i class="fa-solid fa-video" style="color: var(--insta-orange); margin-right: 0.35rem;"></i>
-                        Archivo de Video <span style="font-size: 0.72rem; color: var(--text-muted); text-transform: none;">(Máx. 150 MB)</span>
+                        Archivo de Video <span style="font-size: 0.72rem; color: #4ade80; text-transform: none;">(Máx. 2 GB)</span>
                         <span id="videoReqBadge" style="font-size: 0.72rem; color: var(--insta-orange); text-transform: none; font-weight: 700; display: {{ old('media_type') === 'video' ? 'inline-block' : 'none' }};">(OBLIGATORIO)</span>
                     </label>
 
                     <div class="file-dropzone-custom">
-                        <input type="file" name="video" id="video" class="file-hidden-input" accept="video/mp4,video/webm,video/ogg" onchange="handleFileDropzoneSelect(this, 'vidFileName', previewVideoLive)" {{ old('media_type') === 'video' ? 'required' : '' }}>
+                        <input type="file" name="video" id="video" class="file-hidden-input" accept="video/mp4,video/webm,video/ogg,video/quicktime" onchange="handleFileDropzoneSelect(this, 'vidFileName', previewVideoLive)" {{ old('media_type') === 'video' ? 'required' : '' }}>
                         <div class="file-dropzone-label">
                             <div class="dropzone-badge-icon" style="background: linear-gradient(135deg, var(--insta-magenta), var(--insta-orange));">
                                 <i class="fa-solid fa-video"></i>
                             </div>
                             <div class="dropzone-info-text">
-                                <span class="dropzone-btn-title"><i class="fa-solid fa-film"></i> Subir Video (Máx. 150MB)</span>
+                                <span class="dropzone-btn-title"><i class="fa-solid fa-film"></i> Subir Video (Hasta 2GB)</span>
                                 <span class="dropzone-file-name" id="vidFileName">Ningún archivo seleccionado</span>
                             </div>
                         </div>

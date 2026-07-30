@@ -52,7 +52,7 @@ class ProjectController extends Controller
             'tech_stack' => ['required', 'string'], // comma-separated values
             'project_url' => ['nullable', 'url', 'max:255'],
             'github_url' => ['nullable', 'url', 'max:255'],
-            'image' => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif,webp', 'max:4096'],
+            'image' => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif,webp', 'max:102400'],
             'order' => ['required', 'integer'],
         ]);
 
@@ -91,7 +91,7 @@ class ProjectController extends Controller
             'tech_stack' => ['required', 'string'],
             'project_url' => ['nullable', 'url', 'max:255'],
             'github_url' => ['nullable', 'url', 'max:255'],
-            'image' => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif,webp', 'max:4096'],
+            'image' => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif,webp', 'max:102400'],
             'order' => ['required', 'integer'],
         ]);
 

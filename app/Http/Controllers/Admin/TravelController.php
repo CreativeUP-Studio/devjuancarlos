@@ -63,17 +63,17 @@ class TravelController extends Controller
             'meta_1_text' => ['nullable', 'string', 'max:255'],
             'meta_2_icon' => ['nullable', 'string', 'max:255'],
             'meta_2_text' => ['nullable', 'string', 'max:255'],
-            'image' => ['required', 'image', 'mimes:jpeg,png,jpg,gif,webp', 'max:15360'],
-            'audio' => ['nullable', 'mimes:mp3,wav,ogg,m4a', 'max:20480'],
-            'video' => [$request->media_type === 'video' ? 'required' : 'nullable', 'mimes:mp4,webm,ogg,mov', 'max:153600'],
+            'image' => ['required', 'image', 'mimes:jpeg,png,jpg,gif,webp', 'max:102400'],
+            'audio' => ['nullable', 'mimes:mp3,wav,ogg,m4a', 'max:102400'],
+            'video' => [$request->media_type === 'video' ? 'required' : 'nullable', 'mimes:mp4,webm,ogg,mov', 'max:2097152'],
             'order' => ['required', 'integer'],
         ];
 
         $request->validate($rules, [
             'image.required' => 'La imagen de fondo 100vh es obligatoria para guardar el viaje.',
             'video.required' => 'Debes seleccionar y subir un archivo de video cuando el tipo de contenido es Video.',
-            'video.max' => 'El archivo de video no debe superar los 150 MB.',
-            'image.max' => 'La imagen no debe superar los 15 MB.',
+            'video.max' => 'El archivo de video no debe superar los 2 GB.',
+            'image.max' => 'La imagen no debe superar los 100 MB.',
         ]);
 
         $data = $request->only([
@@ -148,16 +148,16 @@ class TravelController extends Controller
             'meta_1_text' => ['nullable', 'string', 'max:255'],
             'meta_2_icon' => ['nullable', 'string', 'max:255'],
             'meta_2_text' => ['nullable', 'string', 'max:255'],
-            'image' => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif,webp', 'max:15360'],
-            'audio' => ['nullable', 'mimes:mp3,wav,ogg,m4a', 'max:20480'],
-            'video' => [$needVideo ? 'required' : 'nullable', 'mimes:mp4,webm,ogg,mov', 'max:153600'],
+            'image' => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif,webp', 'max:102400'],
+            'audio' => ['nullable', 'mimes:mp3,wav,ogg,m4a', 'max:102400'],
+            'video' => [$needVideo ? 'required' : 'nullable', 'mimes:mp4,webm,ogg,mov', 'max:2097152'],
             'order' => ['required', 'integer'],
         ];
 
         $request->validate($rules, [
             'video.required' => 'Debes subir un archivo de video cuando seleccionas la opción Video.',
-            'video.max' => 'El archivo de video no debe superar los 150 MB.',
-            'image.max' => 'La imagen no debe superar los 15 MB.',
+            'video.max' => 'El archivo de video no debe superar los 2 GB.',
+            'image.max' => 'La imagen no debe superar los 100 MB.',
         ]);
 
         $data = $request->only([

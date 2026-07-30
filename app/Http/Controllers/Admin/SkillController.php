@@ -88,7 +88,7 @@ class SkillController extends Controller
     {
         $request->validate([
             'tech_desc' => ['nullable', 'string'],
-            'tech_image' => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif,webp', 'max:10240'],
+            'tech_image' => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif,webp', 'max:102400'],
         ]);
 
         $profile = \App\Models\Profile::first() ?? new \App\Models\Profile();

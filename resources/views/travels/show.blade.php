@@ -762,19 +762,6 @@
                                 <i class="fa-solid fa-volume-xmark" id="videoVolumeIcon"></i>
                             </button>
                         </div>
-
-                        <!-- HEVC / H.265 Codec Fallback Notice -->
-                        <div id="hevcCodecNotice" style="display:none; position:absolute; bottom:1rem; left:1rem; right:1rem; z-index:25; background:rgba(15,15,20,0.92); backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px); border:1px solid rgba(245,158,11,0.45); border-radius:14px; padding:0.75rem 1rem; color:#fff; font-size:0.78rem; font-family:'Outfit',sans-serif; box-shadow:0 10px 30px rgba(0,0,0,0.5);">
-                            <div style="display:flex; align-items:center; gap:0.4rem; margin-bottom:0.25rem; color:#fbbf24; font-weight:700;">
-                                <i class="fa-solid fa-triangle-exclamation"></i> Códec H.265 / HEVC detectado
-                            </div>
-                            <div style="color:rgba(255,255,255,0.82); line-height:1.35; margin-bottom:0.5rem; font-size:0.74rem;">
-                                Tu navegador no puede decodificar este archivo directamente (grabado en H.265/HEVC). Para reproducirlo sin problema en la web, sube un video MP4 con el códec universal <strong>H.264 (AVC)</strong>.
-                            </div>
-                            <a href="{{ $travelVideoUrl }}" target="_blank" style="display:inline-flex; align-items:center; gap:0.35rem; background:linear-gradient(135deg, var(--insta-orange), var(--insta-magenta)); color:#fff; padding:0.35rem 0.75rem; border-radius:8px; font-weight:600; font-size:0.72rem; text-decoration:none;">
-                                <i class="fa-solid fa-arrow-up-right-from-square"></i> Abrir o descargar archivo de video
-                            </a>
-                        </div>
                     </div>
                 @elseif($travel->image_path)
                     <img src="{{ $travelHeroBgUrl }}" alt="{{ $travel->title }}">
@@ -981,27 +968,12 @@
                 
                 videoWrapper.addEventListener('click', togglePlay);
 
-                const hevcNotice = document.getElementById('hevcCodecNotice');
-
-                function checkCodecHealth() {
-                    // If video is playing but videoWidth is 0, or if error event fired, it's HEVC (H.265) unplayable in Chrome
-                    if (video.error || (video.readyState >= 2 && video.videoWidth === 0)) {
-                        if (hevcNotice) hevcNotice.style.display = 'block';
-                    }
-                }
-
                 video.addEventListener('play', updatePlayState);
                 video.addEventListener('playing', function() {
                     updatePlayState();
                     videoWrapper.style.background = '#000';
-                    setTimeout(checkCodecHealth, 500);
                 });
-                video.addEventListener('loadedmetadata', checkCodecHealth);
                 video.addEventListener('pause', updatePlayState);
-                video.addEventListener('error', function(e) {
-                    console.error('Video error encountered:', video.error);
-                    if (hevcNotice) hevcNotice.style.display = 'block';
-                });
 
                 // Autoplay attempt (starts muted as required by browsers for autoplay)
                 video.muted = true;
@@ -1010,7 +982,6 @@
                 if (playPromise !== undefined) {
                     playPromise.then(() => {
                         updatePlayState();
-                        setTimeout(checkCodecHealth, 500);
                     }).catch(err => {
                         console.log('Autoplay prevented by browser:', err);
                         updatePlayState();
