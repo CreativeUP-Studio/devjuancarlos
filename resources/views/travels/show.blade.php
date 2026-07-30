@@ -49,24 +49,24 @@
     <!-- JSON-LD Structured Data for Travel Experience -->
     <script type="application/ld+json">
     {
-      "@context": "https://schema.org",
-      "@type": "BlogPosting",
+      "@@context": "https://schema.org",
+      "@@type": "BlogPosting",
       "headline": "{{ $travel->title }}",
       "description": "{{ $pageDesc }}",
       "image": "{{ $heroImage }}",
       "author": {
-        "@type": "Person",
+        "@@type": "Person",
         "name": "{{ $profile->name ?? 'Juan Carlos' }}"
       },
       "publisher": {
-        "@type": "Person",
+        "@@type": "Person",
         "name": "{{ $profile->name ?? 'Juan Carlos' }}"
       },
       "contentLocation": {
-        "@type": "Place",
+        "@@type": "Place",
         "name": "{{ $travel->location ?? 'Destino' }}",
         "address": {
-          "@type": "PostalAddress",
+          "@@type": "PostalAddress",
           "addressCountry": "{{ $travel->country ?? '' }}"
         }
       }

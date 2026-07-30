@@ -63,8 +63,8 @@
     <!-- JSON-LD Structured Data for Google Rich Snippets -->
     <script type="application/ld+json">
     {
-      "@@context": "https://schema.org",
-      "@@type": "Person",
+      "@context": "https://schema.org",
+      "@type": "Person",
       "name": "{{ $profile->name ?? 'Juan Carlos' }}",
       "jobTitle": "{{ $profile->title ?? 'Desarrollador Web & Especialista en IA' }}",
       "url": "{{ url('/') }}",

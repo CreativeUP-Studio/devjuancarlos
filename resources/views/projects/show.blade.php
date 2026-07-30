@@ -48,15 +48,15 @@
     <!-- JSON-LD Structured Data for Software / Project Experience -->
     <script type="application/ld+json">
     {
-      "@context": "https://schema.org",
-      "@type": "SoftwareApplication",
+      "@@context": "https://schema.org",
+      "@@type": "SoftwareApplication",
       "name": "{{ $project->title }}",
       "description": "{{ $pageDesc }}",
       "image": "{{ $projectImage }}",
       "applicationCategory": "DeveloperApplication",
       "operatingSystem": "Web",
       "author": {
-        "@type": "Person",
+        "@@type": "Person",
         "name": "{{ $profile->name ?? 'Juan Carlos' }}"
       }
     }
