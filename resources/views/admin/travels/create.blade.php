@@ -685,6 +685,9 @@
                             errorMsg += 'Revisa los campos requeridos del formulario.';
                         }
                         alert(errorMsg);
+                    } else if (xhr.status === 413) {
+                        modal.style.display = 'none';
+                        alert('El servidor web bloqueó la carga por superar el límite de tamaño (Error HTTP 413 Payload Too Large).\n\nSe incluyeron los archivos de configuración .htaccess y .user.ini para 2GB. Si tu servidor usa Nginx o cPanel, solicita aumentar "client_max_body_size 2048M" o "upload_max_filesize" en cPanel.');
                     } else {
                         modal.style.display = 'none';
                         alert('Ocurrió un error al procesar la solicitud (Código HTTP ' + xhr.status + ').');
