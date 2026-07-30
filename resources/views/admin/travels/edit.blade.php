@@ -521,7 +521,7 @@
 </div>
 
 <script>
-    const MAX_VIDEO_SIZE = 150 * 1024 * 1024; // 150 MB
+    const MAX_VIDEO_SIZE = 2048 * 1024 * 1024; // 2 GB (2048 MB)
     const hasExistingVideo = {{ $travel->video_path ? 'true' : 'false' }};
 
     function selectMediaTypeCard(type) {
@@ -554,9 +554,9 @@
         if (input.files && input.files[0]) {
             const file = input.files[0];
 
-            // Client-side 150MB Video Check
+            // Client-side 2GB Video Check
             if (input.id === 'video' && file.size > MAX_VIDEO_SIZE) {
-                alert('El archivo de video seleccionado supera el límite máximo permitido de 150 MB (Tamaño actual: ' + (file.size / (1024*1024)).toFixed(1) + ' MB). Por favor elige un archivo más pequeño.');
+                alert('El archivo de video seleccionado supera el límite máximo permitido de 2 GB (2048 MB) (Tamaño actual: ' + (file.size / (1024*1024)).toFixed(1) + ' MB). Por favor elige un archivo más pequeño.');
                 input.value = '';
                 displayEl.textContent = 'Ningún archivo seleccionado';
                 displayEl.classList.remove('has-file');
