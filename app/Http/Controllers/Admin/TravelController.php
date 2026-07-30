@@ -239,14 +239,11 @@ class TravelController extends Controller
         $targetRelativePath = 'uploads/videos/' . $targetFileName;
         $fullTargetPath = storage_path('app/public/' . $targetRelativePath);
 
-        $ffmpegBinary = storage_path('app/bin/ffmpeg.exe');
-        if (!file_exists($ffmpegBinary)) {
-            $ffmpegBinary = 'ffmpeg';
-        }
+        $ffmpegBinary = $this->getFFmpegBinaryPath();
 
         // Execute FFmpeg transcoding: H.264 (AVC) + AAC audio + yuv420p pixel format
         $cmd = sprintf(
-            '"%s" -y -i "%s" -c:v libx264 -preset fast -crf 23 -pix_fmt yuv420p -c:a aac -b:a 128k "%s" 2>&1',
+            '%s -y -i "%s" -c:v libx264 -preset fast -crf 23 -pix_fmt yuv420p -c:a aac -b:a 128k "%s" 2>&1',
             $ffmpegBinary,
             $fullTempPath,
             $fullTargetPath
@@ -261,8 +258,49 @@ class TravelController extends Controller
             return 'storage/' . $targetRelativePath;
         }
 
+        // Log output if FFmpeg fails for debugging
+        \Illuminate\Support\Facades\Log::error('FFmpeg transcoding failed', [
+            'cmd' => $cmd,
+            'returnCode' => $returnCode,
+            'output' => implode("\n", (array)$output)
+        ]);
+
         // Fallback if transcoding failed or FFmpeg binary is absent
         return 'storage/' . $tempPath;
+    }
+
+    /**
+     * Resolve path to FFmpeg binary dynamically based on OS and environment.
+     */
+    private function getFFmpegBinaryPath(): string
+    {
+        $binDir = storage_path('app/bin');
+        if (!file_exists($binDir)) {
+            @mkdir($binDir, 0755, true);
+        }
+
+        if (str_starts_with(strtoupper(PHP_OS), 'WIN')) {
+            $winExe = $binDir . DIRECTORY_SEPARATOR . 'ffmpeg.exe';
+            if (file_exists($winExe)) {
+                return '"' . $winExe . '"';
+            }
+            return 'ffmpeg';
+        }
+
+        // Linux / Unix environment
+        $linuxBin = $binDir . DIRECTORY_SEPARATOR . 'ffmpeg';
+        if (file_exists($linuxBin)) {
+            @chmod($linuxBin, 0755);
+            return '"' . $linuxBin . '"';
+        }
+
+        // Check system PATH for ffmpeg (e.g. /usr/bin/ffmpeg on Linux)
+        $whichPath = trim((string) @shell_exec('which ffmpeg 2>/dev/null'));
+        if (!empty($whichPath)) {
+            return '"' . $whichPath . '"';
+        }
+
+        return 'ffmpeg';
     }
 
     /**
