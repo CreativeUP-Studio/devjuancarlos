@@ -1,18 +1,82 @@
+@php
+    $travelTitle = $travel->title . ($travel->location ? ' (' . $travel->location . ')' : '');
+    $pageTitle = $travelTitle . ' | ' . ($profile->name ?? 'Juan Carlos') . ' - Bitácora de Viaje';
+    $pageDesc = Str::limit(strip_tags($travel->description), 160);
+    $canonicalUrl = request()->url();
+    $heroImage = $travel->image_path ? asset($travel->image_path) : asset('images/nav_inicio.png');
+@endphp
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
     
-    <!-- SEO Meta Tags -->
-    <title>{{ $travel->title }} - {{ $profile->name ?? 'Portafolio Profesional' }}</title>
-    <meta name="description" content="{{ Str::limit($travel->description, 155) }}">
-    <meta name="author" content="{{ $profile->name ?? 'Juan Carlos Chahuayo Martínez' }}">
-    
+    <!-- Primary SEO Meta Tags -->
+    <title>{{ $pageTitle }}</title>
+    <meta name="title" content="{{ $pageTitle }}">
+    <meta name="description" content="{{ $pageDesc }}">
+    <meta name="author" content="{{ $profile->name ?? 'Juan Carlos' }}">
+    <meta name="keywords" content="Bitácora de Viaje, {{ $travel->location ?? 'Viajes' }}, {{ $travel->country ?? '' }}, Experiencias, Fotografía, Portafolio">
+    <meta name="robots" content="index, follow, max-image-preview:large">
+    <meta name="theme-color" content="#050508">
+    <link rel="canonical" href="{{ $canonicalUrl }}">
+
+    <!-- Favicons & App Icons -->
+    <link rel="icon" type="image/svg+xml" href="{{ asset('favicon.svg') }}">
+    <link rel="shortcut icon" href="{{ asset('favicon.svg') }}" type="image/svg+xml">
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('favicon.svg') }}">
+
+    <!-- Open Graph / Facebook / WhatsApp / LinkedIn -->
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="{{ $canonicalUrl }}">
+    <meta property="og:title" content="{{ $pageTitle }}">
+    <meta property="og:description" content="{{ $pageDesc }}">
+    <meta property="og:image" content="{{ $heroImage }}">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="{{ $travelTitle }}">
+    <meta property="og:site_name" content="{{ $profile->name ?? 'Juan Carlos' }} - Bitácora">
+    <meta property="og:locale" content="es_PE">
+
+    <!-- Twitter / X Cards -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="{{ $canonicalUrl }}">
+    <meta name="twitter:title" content="{{ $pageTitle }}">
+    <meta name="twitter:description" content="{{ $pageDesc }}">
+    <meta name="twitter:image" content="{{ $heroImage }}">
+
+    <!-- JSON-LD Structured Data for Travel Experience -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "BlogPosting",
+      "headline": "{{ $travel->title }}",
+      "description": "{{ $pageDesc }}",
+      "image": "{{ $heroImage }}",
+      "author": {
+        "@type": "Person",
+        "name": "{{ $profile->name ?? 'Juan Carlos' }}"
+      },
+      "publisher": {
+        "@type": "Person",
+        "name": "{{ $profile->name ?? 'Juan Carlos' }}"
+      },
+      "contentLocation": {
+        "@type": "Place",
+        "name": "{{ $travel->location ?? 'Destino' }}",
+        "address": {
+          "@type": "PostalAddress",
+          "addressCountry": "{{ $travel->country ?? '' }}"
+        }
+      }
+    }
+    </script>
+
     <!-- Google Fonts & Icons -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Alex+Brush&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Alex+Brush&family=Great+Vibes&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     
     @vite(['resources/css/app.css', 'resources/js/app.js'])
