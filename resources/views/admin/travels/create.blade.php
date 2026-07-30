@@ -462,17 +462,17 @@
             <div class="form-group" style="margin-bottom: 0; margin-top: 1.5rem;">
                 <label for="audio" class="form-label" style="color: #ffffff;">
                     <i class="fa-solid fa-music" style="color: var(--insta-magenta); margin-right: 0.35rem;"></i>
-                    Música / Pista de Audio de Fondo <span style="font-size: 0.72rem; color: var(--text-muted); text-transform: none;">(Opcional)</span>
+                    Música / Pista de Audio de Fondo <span style="font-size: 0.72rem; color: #4ade80; text-transform: none;">(Varios formatos: MP3, WAV, OGG, M4A, AAC, FLAC, WMA hasta 50 MB)</span>
                 </label>
 
                 <div class="file-dropzone-custom">
-                    <input type="file" name="audio" id="audio" class="file-hidden-input" accept="audio/mp3,audio/wav,audio/m4a,audio/ogg" onchange="handleFileDropzoneSelect(this, 'audFileName', previewAudioLive)">
+                    <input type="file" name="audio" id="audio" class="file-hidden-input" accept="audio/*,.mp3,.wav,.ogg,.oga,.m4a,.aac,.flac,.wma,.opus,.webm" onchange="handleFileDropzoneSelect(this, 'audFileName', previewAudioLive)">
                     <div class="file-dropzone-label">
                         <div class="dropzone-badge-icon" style="background: linear-gradient(135deg, var(--insta-blue), var(--insta-purple));">
                             <i class="fa-solid fa-music"></i>
                         </div>
                         <div class="dropzone-info-text">
-                            <span class="dropzone-btn-title"><i class="fa-solid fa-headphones"></i> Subir Pista de Audio (.mp3)</span>
+                            <span class="dropzone-btn-title"><i class="fa-solid fa-headphones"></i> Subir Música (Varios Formatos hasta 50MB)</span>
                             <span class="dropzone-file-name" id="audFileName">Ningún archivo seleccionado</span>
                         </div>
                     </div>
@@ -498,6 +498,7 @@
 
 <script>
     const MAX_VIDEO_SIZE = 2048 * 1024 * 1024; // 2 GB (2048 MB)
+    const MAX_AUDIO_SIZE = 50 * 1024 * 1024; // 50 MB
 
     function selectMediaTypeCard(type) {
         const cardImg = document.getElementById('cardMediaImage');
@@ -532,6 +533,15 @@
             // Client-side 2GB Video Check
             if (input.id === 'video' && file.size > MAX_VIDEO_SIZE) {
                 alert('El archivo de video seleccionado supera el límite máximo permitido de 2 GB (2048 MB) (Tamaño actual: ' + (file.size / (1024*1024)).toFixed(1) + ' MB). Por favor elige un archivo más pequeño.');
+                input.value = '';
+                displayEl.textContent = 'Ningún archivo seleccionado';
+                displayEl.classList.remove('has-file');
+                return;
+            }
+
+            // Client-side 50MB Audio Check
+            if (input.id === 'audio' && file.size > MAX_AUDIO_SIZE) {
+                alert('El archivo de música seleccionado supera el límite máximo permitido de 50 MB (Tamaño actual: ' + (file.size / (1024*1024)).toFixed(1) + ' MB). Por favor elige un archivo de audio más ligero.');
                 input.value = '';
                 displayEl.textContent = 'Ningún archivo seleccionado';
                 displayEl.classList.remove('has-file');

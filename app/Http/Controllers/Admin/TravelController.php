@@ -64,7 +64,7 @@ class TravelController extends Controller
             'meta_2_icon' => ['nullable', 'string', 'max:255'],
             'meta_2_text' => ['nullable', 'string', 'max:255'],
             'image' => ['required', 'image', 'mimes:jpeg,png,jpg,gif,webp', 'max:102400'],
-            'audio' => ['nullable', 'mimes:mp3,wav,ogg,m4a', 'max:102400'],
+            'audio' => ['nullable', 'mimes:mp3,wav,ogg,oga,m4a,aac,flac,wma,opus,webm,caf', 'max:51200'],
             'video' => [$request->media_type === 'video' ? 'required' : 'nullable', 'mimes:mp4,webm,ogg,mov', 'max:2097152'],
             'order' => ['required', 'integer'],
         ];
@@ -74,6 +74,8 @@ class TravelController extends Controller
             'video.required' => 'Debes seleccionar y subir un archivo de video cuando el tipo de contenido es Video.',
             'video.max' => 'El archivo de video no debe superar los 2 GB.',
             'image.max' => 'La imagen no debe superar los 100 MB.',
+            'audio.max' => 'El archivo de música/audio no debe superar los 50 MB.',
+            'audio.mimes' => 'El archivo de música/audio debe ser de un formato válido (MP3, WAV, OGG, M4A, AAC, FLAC, WMA, OPUS, WEBM).',
         ]);
 
         $data = $request->only([
@@ -149,7 +151,7 @@ class TravelController extends Controller
             'meta_2_icon' => ['nullable', 'string', 'max:255'],
             'meta_2_text' => ['nullable', 'string', 'max:255'],
             'image' => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif,webp', 'max:102400'],
-            'audio' => ['nullable', 'mimes:mp3,wav,ogg,m4a', 'max:102400'],
+            'audio' => ['nullable', 'mimes:mp3,wav,ogg,oga,m4a,aac,flac,wma,opus,webm,caf', 'max:51200'],
             'video' => [$needVideo ? 'required' : 'nullable', 'mimes:mp4,webm,ogg,mov', 'max:2097152'],
             'order' => ['required', 'integer'],
         ];
@@ -158,6 +160,8 @@ class TravelController extends Controller
             'video.required' => 'Debes subir un archivo de video cuando seleccionas la opción Video.',
             'video.max' => 'El archivo de video no debe superar los 2 GB.',
             'image.max' => 'La imagen no debe superar los 100 MB.',
+            'audio.max' => 'El archivo de música/audio no debe superar los 50 MB.',
+            'audio.mimes' => 'El archivo de música/audio debe ser de un formato válido (MP3, WAV, OGG, M4A, AAC, FLAC, WMA, OPUS, WEBM).',
         ]);
 
         $data = $request->only([
