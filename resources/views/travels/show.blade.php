@@ -274,7 +274,7 @@
             justify-items: center;
         }
 
-        /* Left Side: Media Container (Photo or Video Player in Natural Ratio) */
+        /* Left Side: Media Container (Photo or Video Player in Pure Natural Ratio without borders) */
         .square-media-card {
             position: relative;
             width: 100%;
@@ -284,28 +284,33 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            border-radius: 24px;
-            overflow: hidden;
-            border: 1px solid rgba(255, 255, 255, 0.18);
-            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(255, 255, 255, 0.05);
-            background: #000000;
-            transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.4s ease;
+            border-radius: 0 !important;
+            overflow: visible;
+            border: none !important;
+            box-shadow: none !important;
+            outline: none !important;
+            background: transparent !important;
+            transition: transform 0.4s ease;
         }
 
         .square-media-card:hover {
-            transform: translateY(-3px) scale(1.008);
-            border-color: rgba(255, 255, 255, 0.38);
+            transform: scale(1.008);
+            border: none !important;
+            box-shadow: none !important;
         }
 
         .square-media-card img {
             max-width: 100%;
             max-height: calc(100vh - 175px);
-            width: 100%;
-            height: 100%;
+            width: auto;
+            height: auto;
             object-fit: contain;
             display: block;
-            border-radius: 24px;
-            background: #000000;
+            border-radius: 0 !important;
+            border: none !important;
+            box-shadow: none !important;
+            outline: none !important;
+            background: transparent !important;
         }
 
         .square-placeholder {
@@ -318,6 +323,7 @@
             color: rgba(255, 255, 255, 0.2);
             font-size: 4rem;
             background: linear-gradient(135deg, #0a0a10 0%, #151520 100%);
+            border-radius: 16px;
         }
 
         /* ----------------------------------------------------
@@ -328,24 +334,30 @@
             width: 100%;
             height: 100%;
             max-height: calc(100vh - 175px);
-            border-radius: 24px;
+            border-radius: 0 !important;
             overflow: hidden;
-            background: #000000;
+            background: transparent !important;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
+            border: none !important;
+            box-shadow: none !important;
+            outline: none !important;
         }
 
         .custom-video-wrapper video {
             max-width: 100%;
             max-height: calc(100vh - 175px);
-            width: 100%;
-            height: 100%;
+            width: auto;
+            height: auto;
             object-fit: contain;
             display: block;
-            border-radius: 24px;
-            background: #000000;
+            border-radius: 0 !important;
+            border: none !important;
+            box-shadow: none !important;
+            outline: none !important;
+            background: transparent !important;
         }
 
         .video-overlay-controls {
@@ -617,36 +629,45 @@
                 max-width: 100%;
                 height: auto;
                 max-height: 60vh;
-                border-radius: 20px;
+                border-radius: 0 !important;
                 margin: 0 auto;
                 display: flex;
                 align-items: center;
                 justify-content: center;
-                background: #000000;
-                overflow: hidden;
+                background: transparent !important;
+                overflow: visible;
+                border: none !important;
+                box-shadow: none !important;
+                outline: none !important;
             }
 
             .square-media-card img,
             .custom-video-wrapper video {
                 max-width: 100%;
                 max-height: 60vh;
-                width: 100%;
+                width: auto;
                 height: auto;
                 object-fit: contain;
                 display: block;
-                border-radius: 20px;
-                background: #000000;
+                border-radius: 0 !important;
+                background: transparent !important;
+                border: none !important;
+                box-shadow: none !important;
+                outline: none !important;
             }
 
             .custom-video-wrapper {
                 width: 100%;
                 height: auto;
                 max-height: 60vh;
-                border-radius: 20px;
+                border-radius: 0 !important;
                 display: flex;
                 align-items: center;
                 justify-content: center;
-                background: #000000;
+                background: transparent !important;
+                border: none !important;
+                box-shadow: none !important;
+                outline: none !important;
             }
 
             .details-right-panel {
@@ -724,14 +745,20 @@
 
             .square-media-card {
                 max-height: 52vh;
-                border-radius: 16px;
+                border-radius: 0 !important;
+                border: none !important;
+                box-shadow: none !important;
+                outline: none !important;
             }
 
             .square-media-card img,
             .custom-video-wrapper video,
             .custom-video-wrapper {
                 max-height: 52vh;
-                border-radius: 16px;
+                border-radius: 0 !important;
+                border: none !important;
+                box-shadow: none !important;
+                outline: none !important;
             }
 
             .travel-detail-title {
