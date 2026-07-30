@@ -64,8 +64,33 @@
             transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1); 
         }
         .admin-sidebar-header { 
-            padding: 2.2rem 2rem; 
+            padding: 1.75rem 1.5rem; 
             border-bottom: 1px solid var(--border-color); 
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .sidebar-close-btn {
+            display: none;
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .sidebar-close-btn:hover {
+            background: rgba(239, 68, 68, 0.15);
+            border-color: rgba(239, 68, 68, 0.3);
+            color: #ffffff;
+            transform: scale(1.05);
         }
         .admin-logo-modern { 
             display: flex; 
@@ -713,25 +738,34 @@
         /* RESPONSIVE MEDIA QUERIES */
         @media (max-width: 1024px) {
             .admin-sidebar-modern {
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 290px;
+                max-width: 85vw;
+                height: 100vh;
+                height: 100dvh;
+                z-index: 10000;
                 transform: translateX(-100%);
-                box-shadow: none;
+                box-shadow: 0 0 50px rgba(0, 0, 0, 0.85);
+                transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
             }
 
             .admin-sidebar-modern.sidebar-open {
                 transform: translateX(0);
-                box-shadow: 10px 0 40px rgba(0, 0, 0, 0.85);
+            }
+
+            .sidebar-close-btn {
+                display: flex !important;
             }
 
             .admin-main-wrapper {
                 margin-left: 0 !important;
+                width: 100% !important;
             }
 
             .mobile-menu-toggle {
                 display: flex !important;
-            }
-
-            .topbar-search {
-                display: none;
             }
         }
 
@@ -739,6 +773,18 @@
             .admin-topbar {
                 padding: 0 1.25rem;
                 height: 72px;
+            }
+
+            .topbar-search {
+                position: relative;
+            }
+
+            .topbar-search input {
+                width: 150px;
+            }
+
+            .topbar-user .user-info {
+                display: none;
             }
 
             .admin-content {
@@ -785,18 +831,6 @@
                 padding: 1rem;
             }
 
-            .topbar-user .user-info {
-                display: none;
-            }
-
-            .topbar-notification {
-                display: none;
-            }
-
-            .admin-sidebar-modern {
-                width: 280px;
-            }
-
             .btn-primary {
                 width: 100%;
                 justify-content: center;
@@ -818,11 +852,27 @@
 
         @media (max-width: 480px) {
             .admin-sidebar-modern {
-                width: 85vw;
+                width: 88vw;
             }
 
             .admin-topbar {
                 padding: 0 0.85rem;
+                height: 68px;
+            }
+
+            .topbar-search input {
+                width: 110px;
+                font-size: 0.82rem;
+            }
+
+            .topbar-dropdown-menu {
+                width: 290px;
+                right: -10px;
+            }
+
+            .topbar-dropdown-menu.search-results-dropdown {
+                width: 300px;
+                left: -10px;
             }
 
             .admin-content {
@@ -862,6 +912,9 @@
                     <span class="logo-subtitle">Admin Panel</span>
                 </div>
             </div>
+            <button class="sidebar-close-btn" id="sidebarCloseBtn" title="Cerrar Menú Lateral">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
         </div>
 
         <!-- Navigation Menu -->
@@ -1259,6 +1312,7 @@
         const adminSidebar = document.getElementById('adminSidebar');
         const sidebarBackdrop = document.getElementById('sidebarBackdrop');
         const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+        const sidebarCloseBtn = document.getElementById('sidebarCloseBtn');
 
         function openSidebar() {
             adminSidebar?.classList.add('sidebar-open');
@@ -1281,7 +1335,16 @@
             }
         });
 
+        sidebarCloseBtn?.addEventListener('click', closeSidebar);
         sidebarBackdrop?.addEventListener('click', closeSidebar);
+
+        // Keyboard navigation (Escape key closes sidebar & dropdowns)
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeSidebar();
+                closeAllTopbarDropdowns();
+            }
+        });
 
         // Auto-close sidebar on mobile link navigation
         document.querySelectorAll('.admin-nav-link, .sidebar-footer-link').forEach(link => {
