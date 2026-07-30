@@ -598,7 +598,7 @@
             .fullscreen-travel-hero {
                 height: auto;
                 min-height: 100vh;
-                padding: 85px 4% 40px;
+                padding: 85px 4% 95px;
                 align-items: flex-start;
                 overflow-y: visible;
             }
@@ -608,17 +608,50 @@
                 gap: 1.75rem;
                 max-height: none;
                 overflow: visible;
+                width: 100%;
+                max-width: 100%;
             }
 
             .square-media-card {
-                max-height: 340px;
-                border-radius: 18px;
+                width: 100%;
+                max-width: 100%;
+                height: auto;
+                max-height: 60vh;
+                border-radius: 20px;
                 margin: 0 auto;
-                max-width: 360px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                background: #000000;
+                overflow: hidden;
+            }
+
+            .square-media-card img,
+            .custom-video-wrapper video {
+                max-width: 100%;
+                max-height: 60vh;
+                width: 100%;
+                height: auto;
+                object-fit: contain;
+                display: block;
+                border-radius: 20px;
+                background: #000000;
+            }
+
+            .custom-video-wrapper {
+                width: 100%;
+                height: auto;
+                max-height: 60vh;
+                border-radius: 20px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                background: #000000;
             }
 
             .details-right-panel {
                 max-height: none;
+                width: 100%;
             }
 
             .travel-detail-title {
@@ -673,6 +706,10 @@
         }
 
         @media (max-width: 480px) {
+            .fullscreen-travel-hero {
+                padding: 80px 4% 90px;
+            }
+
             .btn-back-home span {
                 display: none;
             }
@@ -686,7 +723,14 @@
             }
 
             .square-media-card {
-                max-height: 280px;
+                max-height: 52vh;
+                border-radius: 16px;
+            }
+
+            .square-media-card img,
+            .custom-video-wrapper video,
+            .custom-video-wrapper {
+                max-height: 52vh;
                 border-radius: 16px;
             }
 
